@@ -10,15 +10,21 @@ public class Pawn extends Piece {
 
     @Override
     public boolean isValidPath(int destinationX, int destinationY) {
-        int xSub = destinationX - this.pieceX;
-        int ySub = destinationY - this.pieceY;
+        int xSub = Math.abs(destinationX - this.pieceX);
+        int ySub = Math.abs(destinationY - this.pieceY);
+        if ((xSub == 1) && (ySub == 0)) {
+            return true;
+        }
+
+        if (pawnCanCapture(this, destinationX, destinationY)) {
+            return true;
+        }
+
         if (this.pieceX == 1 || this.pieceX == 6) {
             return (xSub == 1 || xSub == 2) && (ySub == 0);
         }
-        //if (this.pieceX == 1 && pieceColor == Color.white) {
-        //    return (xSub == 1 || xSub == 2) && (ySub == 0);
-        //}
-        return (xSub == 1) && (ySub == 0);
+
+        return false;
     }
 
     @Override
@@ -26,10 +32,10 @@ public class Pawn extends Piece {
         return Type.Pawn;
     }
 
-    public boolean pawnCanCapture(int destinationX, int destinationY) {
-        int xSub = destinationX - this.pieceX;
-        int ySub = destinationY - this.pieceY;
-        return (xSub == ySub);
+    public static boolean pawnCanCapture(Piece piece, int destinationX, int destinationY) {
+        int xSub = Math.abs(destinationX - piece.pieceX);
+        int ySub = Math.abs(destinationY - piece.pieceY);
+        return (xSub == 1) && (ySub == 1);
     }
 
 }

@@ -45,9 +45,9 @@ public class BoardGui {
         final List<SquarePanel> boardSquares;
 
         public BoardPanel() {
-            setLayout(new GridLayout(8, 8));
+            setLayout(new GridLayout(chessBoard.height, chessBoard.width));
             boardSquares = new ArrayList<>();
-            for (int i = 0; i < 8 * 8; ++i) {
+            for (int i = 0; i < chessBoard.height * chessBoard.width; ++i) {
                 final SquarePanel squarePanel = new SquarePanel(i, this);
                 boardSquares.add(squarePanel);
                 add(squarePanel);

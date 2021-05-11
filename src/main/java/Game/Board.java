@@ -109,9 +109,7 @@ public class Board {
         if (boardArr[destinationX][destinationY]!= null &&
                 boardArr[destinationX][destinationY].pieceColor != piece.pieceColor) {
             if (piece.getPieceType() == Type.Pawn) {
-                int xSub = destinationX - piece.pieceX;
-                int ySub = destinationY - piece.pieceY;
-                return (xSub == 1 && ySub == 1);
+                return Pawn.pawnCanCapture(piece, destinationX, destinationY);
             }
             else {
                 return true;
