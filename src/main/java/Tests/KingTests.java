@@ -73,7 +73,7 @@ public class KingTests {
     public void capture() {
         Game game = new Game();
         Piece king = new King(3, 3, game.player1.color);
-        new Pawn(4, 4, game.player2.color);
+        new Pawn(4, 4, game.player2.color, false);
 
         game.board.movePiece(king, 4, 4);
         assertEquals(king, game.board.boardArr[4][4]);

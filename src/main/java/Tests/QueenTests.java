@@ -73,7 +73,7 @@ public class QueenTests {
     public void capture() {
         Game game = new Game();
         Piece queen = new Queen(3, 3, game.player1.color);
-        new Pawn(5, 5, game.player2.color);
+        new Pawn(5, 5, game.player2.color, false);
 
         game.board.movePiece(queen, 5, 5);
         assertEquals(queen, game.board.boardArr[5][5]);

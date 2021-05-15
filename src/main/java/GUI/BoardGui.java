@@ -17,6 +17,8 @@ import static javax.swing.SwingUtilities.*;
 
 public class BoardGui {
     Game game;
+    Player currentPlayer;
+    boolean endTurn = false;
     private final JFrame gameFrame;
     private final Board chessBoard;
     private static String pieceIconPath = "src/main/java/GUI/Icons/";
@@ -26,8 +28,21 @@ public class BoardGui {
     private Piece destinationSquare;
     private Piece movedPiece;
 
+    public synchronized void waitForInput()
+    {
+        while(!endTurn)
+        {
+            try{
+                wait();
+            } catch (InterruptedException e){ e.printStackTrace();}
+        }
+    }
 
-
+    public synchronized  void notifyInput()
+    {
+        endTurn = true;
+        notifyAll();
+    }
 
     public BoardGui() {
         this.game = new Game();
@@ -36,9 +51,37 @@ public class BoardGui {
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameFrame.setSize(600, 600);
         gameFrame.setLayout(new BorderLayout());
+        final JMenuBar menuBar = new JMenuBar();
+        fillMenu(menuBar);
+        this.gameFrame.setJMenuBar(menuBar);
         BoardPanel panel = new BoardPanel();
         gameFrame.add(panel, BorderLayout.CENTER);
         gameFrame.setVisible(true);
+    }
+
+    private void fillMenu(final JMenuBar menuBar) {
+        menuBar.add(createFileMenu());
+    }
+
+    private JMenu createFileMenu() {
+        final JMenu fileMenu = new JMenu("File");
+        final JMenuItem loadPGN = new JMenuItem("Load game");
+        loadPGN.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        fileMenu.add(loadPGN);
+        final JMenuItem savePGN = new JMenuItem("Save game");
+        savePGN.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+        fileMenu.add(savePGN);
+        return fileMenu;
     }
 
     public class BoardPanel extends JPanel {
@@ -57,7 +100,7 @@ public class BoardGui {
 
         }
 
-        public void drawBoard(Board board) {
+        public void redrawBoard(Board board) {
             removeAll();
             for (SquarePanel squarePanel : boardSquares) {
                 squarePanel.drawSquare(board);
@@ -86,6 +129,11 @@ public class BoardGui {
                     if (isLeftMouseButton(e)) {
                         if (sourceSquare == null) {
                             sourceSquare = chessBoard.getSquare(squareNum);
+                            if (sourceSquare.pieceColor != currentPlayer.color) {
+                                sourceSquare = null;
+                                System.out.println("Invalid move, wrong player");
+                            }
+
                             movedPiece = sourceSquare;
                             System.out.println("square num = " + squareNum);
                             System.out.println("source square = " + sourceSquare);
@@ -103,7 +151,13 @@ public class BoardGui {
                             int row = squareNum / 8;
                             int col = squareNum - (row * 8);
                             chessBoard.movePiece(sourceSquare, row, col);
+                            if (chessBoard.moveSuccessful(sourceSquare, row, col)) {
+                                notifyInput();
+
+                            }
                             System.out.println(chessBoard.boardArr[row][col]);
+                            /*trys to promote pawn if possible*/
+                            chessBoard.promotePawn(sourceSquare);
 
                             sourceSquare = null;
                             destinationSquare = null;
@@ -116,8 +170,8 @@ public class BoardGui {
                         movedPiece = null;
                     }
                     invokeLater(() -> {
-                        boardPanel.drawBoard(chessBoard);
-
+                        boardPanel.redrawBoard(chessBoard);
+                       // notifyInput();
                     });
 
                 }

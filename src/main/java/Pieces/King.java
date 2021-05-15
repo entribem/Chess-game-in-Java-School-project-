@@ -16,6 +16,8 @@ public class King extends Piece {
         return (xSub < 2) && (ySub < 2);
     }
 
+
+
     @Override
     public Type getPieceType() {
         return Type.King;

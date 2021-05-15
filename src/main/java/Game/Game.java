@@ -4,6 +4,7 @@ import java.util.Random;
 public class Game {
     public Player player1, player2;
     public Board board;
+    public int turn;
     final static int standardHeight = 8, standardWidth = 8;
 
     public Game() {
@@ -13,9 +14,10 @@ public class Game {
     public void loadGame() {
         board = new Board(this, standardHeight, standardWidth);
         loadPlayers();
-        board.loadPieces();
+        board.loadStandardPieces();
+        turn = 1;
     }
-
+    /*Creates two players and randomly assigns colors*/
     public void loadPlayers() {
         Random rand = new Random();
         int randomNum = rand.nextInt(2);

@@ -13,6 +13,7 @@ public class Rook extends Piece {
         return (destinationX == this.pieceX) || (destinationY == this.pieceY);
     }
 
+
     @Override
     public Type getPieceType() {
         return Type.Rook;

@@ -6,6 +6,7 @@ import Game.Player;
 public abstract class Piece {
     public int pieceX, pieceY;
     public final Color pieceColor;
+    public boolean moved2Forward;
 
     public Piece(int pieceX, int pieceY, final Color pieceColor) {
         this.pieceX = pieceX;
@@ -14,6 +15,12 @@ public abstract class Piece {
     }
 
     public abstract boolean isValidPath(int destinationX, int destinationY);
+
+    //public boolean hasMoved2Forward() {
+    //    return this.moved2Forward;
+    //}
+
+   // public abstract boolean isValidLeaping(int destinationX, int destinationY);
 
     public int getPiecePositionX() {
         return this.pieceX;

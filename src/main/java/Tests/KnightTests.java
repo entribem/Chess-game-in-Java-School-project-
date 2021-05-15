@@ -74,7 +74,7 @@ public class KnightTests {
     public void capture() {
         Game game = new Game();
         Piece knight = new Knight(4, 4, game.player1.color);
-        new Pawn(2, 3, game.player2.color);
+        new Pawn(2, 3, game.player2.color, false);
 
         game.board.movePiece(knight, 2, 3);
         assertEquals(knight, game.board.boardArr[2][3]);
