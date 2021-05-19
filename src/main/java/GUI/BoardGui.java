@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static PGN.PGNUtilities.saveMove;
 import static javax.swing.SwingUtilities.*;
 
 public class BoardGui {
@@ -34,11 +35,13 @@ public class BoardGui {
         {
             try{
                 wait();
-            } catch (InterruptedException e){ e.printStackTrace();}
+            } catch (InterruptedException e){
+                e.printStackTrace();
+            }
         }
     }
 
-    public synchronized  void notifyInput()
+    public synchronized void notifyInput()
     {
         endTurn = true;
         notifyAll();
@@ -55,7 +58,9 @@ public class BoardGui {
         fillMenu(menuBar);
         this.gameFrame.setJMenuBar(menuBar);
         BoardPanel panel = new BoardPanel();
+        //gameFrame.getContentPane().add(panel, BorderLayout.CENTER);
         gameFrame.add(panel, BorderLayout.CENTER);
+        //gameFrame.setContentPane(panel);
         gameFrame.setVisible(true);
     }
 
@@ -97,8 +102,8 @@ public class BoardGui {
             }
             setPreferredSize(BOARD_PANEL_DIMENSION);
             validate();
-
         }
+
 
         public void redrawBoard(Board board) {
             removeAll();
@@ -108,8 +113,7 @@ public class BoardGui {
             }
             repaint();
             validate();
-
-
+        }
     }
 
     private class SquarePanel extends JPanel {
@@ -150,10 +154,14 @@ public class BoardGui {
                             System.out.println("destination square = " + destinationSquare);
                             int row = squareNum / 8;
                             int col = squareNum - (row * 8);
+                            int pieceX = sourceSquare.pieceX;
+                            int pieceY = sourceSquare.pieceY;
+                            movedPiece = sourceSquare;
                             chessBoard.movePiece(sourceSquare, row, col);
                             if (chessBoard.moveSuccessful(sourceSquare, row, col)) {
                                 notifyInput();
-
+                                System.out.println("movedPiece = " + movedPiece.pieceX + movedPiece.pieceY + " sourceSquare = " + sourceSquare.pieceX + sourceSquare.pieceY);
+                                saveMove(destinationSquare, sourceSquare, pieceX, pieceY, chessBoard);
                             }
                             System.out.println(chessBoard.boardArr[row][col]);
                             /*trys to promote pawn if possible*/
@@ -171,7 +179,6 @@ public class BoardGui {
                     }
                     invokeLater(() -> {
                         boardPanel.redrawBoard(chessBoard);
-                       // notifyInput();
                     });
 
                 }
@@ -236,11 +243,10 @@ public class BoardGui {
             validate();
         }
     }
-    }
 
 
-    public static void main(String args[]) {
+    /*public static void main(String args[]) {
         Chess chess = new Chess();
-        chess.gameLoop();
-    }
+        chess.startGame();
+    }*/
 }

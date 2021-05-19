@@ -21,7 +21,7 @@ public class Board {
 
     public void loadPiecesPlayer2() {
         for (int i = 0; i < width; ++i) {
-            Piece pawn = new Pawn(1, i, game.player2.color, false);
+            Piece pawn = new Pawn(1, i, game.player2.color);
             boardArr[1][i] = pawn;
         }
 
@@ -49,7 +49,7 @@ public class Board {
 
     public void loadPiecesPlayer1() {
         for (int i = 0; i < width; ++i) {
-            Piece pawn = new Pawn(6, i, game.player1.color, false);
+            Piece pawn = new Pawn(6, i, game.player1.color);
             boardArr[6][i] = pawn;
         }
 
@@ -77,9 +77,25 @@ public class Board {
 
     public void movePiece(Piece piece, int destinationX, int destinationY) {
         if (piece.isValidPath(destinationX, destinationY) && isMoveValid(piece, destinationX, destinationY)) {
-            if (pawnCanEnPassant(piece)) {
+            if (pawnCanEnPassant(piece) && piece.pieceColor == game.player1.color) {
                 boardArr[destinationX + 1][destinationY] = null;
             }
+            else if (pawnCanEnPassant(piece) && piece.pieceColor == game.player2.color) {
+                boardArr[destinationX - 1][destinationY] = null;
+            }
+            if (piece.getPieceType() == Type.King) {
+                if (kingCanCastle(piece, destinationX, destinationY)) {
+                    castleMove(destinationX, destinationY);
+                }
+            }
+
+            if (piece.getPieceType() == Type.King) {
+                piece.hasMoved = true;
+            }
+            else if (piece.getPieceType() == Type.Rook) {
+                piece.hasMoved = true;
+            }
+
             setPieceLocation(piece, destinationX, destinationY);
         }
         else {
@@ -102,6 +118,12 @@ public class Board {
     }
 
     public boolean isMoveValid(Piece piece, int destinationX, int destinationY) {
+        if (piece.getPieceType() == Type.Pawn) {
+            if (!Pawn.pawnCanCapture(piece, destinationX, destinationY) && boardArr[destinationX][destinationY] != null) {
+                return false;
+            }
+        }
+
         if (piece.getPieceType() == Type.Pawn && Pawn.pawnCanCapture(piece, destinationX, destinationY)
             && boardArr[destinationX][destinationY] == null && !pawnCanEnPassant(piece)) {
             return false;
@@ -113,8 +135,6 @@ public class Board {
     public void canCaptureKing(int destinationX, int destinationY) {
         if (boardArr[destinationX][destinationY] != null) {
             if (boardArr[destinationX][destinationY].getPieceType() == Type.King) {
-                System.out.println("Player1 color = " + game.player1.color + " Player2 color = " + game.player2.color);
-                System.out.println("PIECE COLOR = " + boardArr[destinationX][destinationY].pieceColor);
                 if (boardArr[destinationX][destinationY].getPieceColor() == game.player1.color) {
                     game.player1.hasLost = true;
                     System.out.println("PLAYER 1 HAS LOST");
@@ -126,23 +146,9 @@ public class Board {
         }
     }
 
-    /*public boolean canCapture(Piece piece, int destinationX, int destinationY) {
-        System.out.println("DEBUG FOR " + piece.getPieceType());
+    public boolean canCapture(Piece piece, int destinationX, int destinationY) {
         if ((boardArr[destinationX][destinationY]!= null &&
                 boardArr[destinationX][destinationY].pieceColor != piece.pieceColor)) {
-            System.out.println("DEBUG");
-            if (boardArr[destinationX][destinationY].getPieceType() == Type.King) {
-                System.out.println("Player1 color = " + game.player1.color + " Player2 color = " + game.player2.color);
-                System.out.println("PIECE COLOR = " + boardArr[destinationX][destinationY].pieceColor);
-                if (boardArr[destinationX][destinationY].getPieceColor() == game.player1.color) {
-                    game.player1.hasLost = true;
-                    System.out.println("PLAYER 1 HAS LOST");
-                }
-                else if (boardArr[destinationX][destinationY].getPieceColor() == game.player2.color){
-                    game.player2.hasLost = true;
-                    System.out.println("PLAYER 2 HAS LOST");
-                }
-            }
             if (piece.getPieceType() == Type.Pawn) {
                 return Pawn.pawnCanCapture(piece, destinationX, destinationY);
             }
@@ -153,7 +159,7 @@ public class Board {
         else {
             return false;
         }
-    }*/
+    }
 
     public boolean isDestinationValid(Piece piece, int destinationX, int destinationY) {
         if (boardArr[destinationX][destinationY] == null) {
@@ -175,21 +181,24 @@ public class Board {
         int xSub = destinationX - piece.pieceX;
         int ySub = destinationY - piece.pieceY;
 
+        int x = piece.pieceX;
+        int y = piece.pieceY;
+
         if (piece.getPieceType() == Type.Pawn && Math.abs(xSub) != 2) {
             return true;
         }
 
         if (ySub == 0) {
             if (xSub > 0) {
-                for (int i = piece.pieceX + 1; i < destinationX; ++i) {
-                    if (boardArr[i][piece.pieceY] != null) {
+                for (int i = x + 1; i < destinationX; ++i) {
+                    if (boardArr[i][y] != null) {
                         return false;
                     }
                 }
             }
             else {
-                for (int i = piece.pieceX - 1; i > destinationX; --i) {
-                    if (boardArr[i][piece.pieceY] != null) {
+                for (int i = x - 1; i > destinationX; --i) {
+                    if (boardArr[i][y] != null) {
                         return false;
                     }
                 }
@@ -197,52 +206,47 @@ public class Board {
         }
         else if (xSub == 0) {
             if (ySub > 0) {
-                for (int i = piece.pieceY + 1; i < destinationY; ++i) {
-                    if (boardArr[piece.pieceX][i] != null) {
+                for (int i = y + 1; i < destinationY; ++i) {
+                    if (boardArr[x][i] != null) {
                         return false;
                     }
                 }
             }
             else {
-                for (int i = piece.pieceY - 1; i > destinationY; --i) {
-                    if (boardArr[piece.pieceX][i] != null) {
+                for (int i = y - 1; i > destinationY; --i) {
+                    if (boardArr[x][i] != null) {
                         return false;
                     }
                 }
             }
         }
         else if (xSub > 0 && ySub > 0) {
-            int i = piece.pieceX + 1;
-            int j = piece.pieceY + 1;
-            for (int k = 0; k < xSub; ++k) {
-                if (boardArr[i + k][j + k] != null) {
+            System.out.println("DEBUG");
+            for (int k = 1; k < xSub; ++k) {
+                if (boardArr[x + k][y + k] != null) {
                     return false;
                 }
             }
         }
         else if (xSub < 0 && ySub < 0) {
-            int i = piece.pieceX - 1;
-            int j = piece.pieceY - 1;
-            for (int k = 0; k < Math.abs(xSub); ++k) {
-                if (boardArr[i + k][j + k] != null) {
+            System.out.println("DEBUG");;
+            for (int k = 1; k < Math.abs(xSub); ++k) {
+                if (boardArr[x - k][y - k] != null) {
                     return false;
                 }
             }
         }
         else if (xSub > 0 && ySub < 0) {
-            int i = piece.pieceX + 1;
-            int j = piece.pieceY - 1;
-            for (int k = 0; k < Math.abs(xSub); ++k) {
-                if (boardArr[i + k][j + k] != null) {
+            System.out.println("DEBUG");
+            for (int k = 1; k < Math.abs(xSub); ++k) {
+                if (boardArr[x + k][y - k] != null) {
                     return false;
                 }
             }
         }
         else if (xSub < 0 && ySub > 0) {
-            int i = piece.pieceX - 1;
-            int j = piece.pieceY + 1;
-            for (int k = 0; k < Math.abs(xSub); ++k) {
-                if (boardArr[i + k][j + k] != null) {
+            for (int k = 1; k < Math.abs(xSub); ++k) {
+                if (boardArr[x - k][y + k] != null) {
                     return false;
                 }
             }
@@ -264,6 +268,8 @@ public class Board {
         }
     }
 
+    /*Checks if the pawn can be promoted*/
+    //fix promotion??
     public boolean pawnCanPromote(Piece piece) {
         if (piece.getPieceType() == Type.Pawn) {
             if (piece.pieceColor == game.player1.color) {
@@ -298,6 +304,36 @@ public class Board {
             }
         }
         return false;
+    }
+
+    public boolean kingCanCastle(Piece piece, int destinationX, int destinationY) {
+        if (boardArr[destinationX][destinationY + 1] != null || boardArr[destinationX][destinationY - 2] != null) {
+            if (destinationY > piece.pieceY) {
+                if (boardArr[destinationX][destinationY + 1].getPieceType() == Type.Rook) {
+                    return (!piece.hasMoved) && (!boardArr[destinationX][destinationY + 1].hasMoved);
+                }
+            } else {
+                if (boardArr[destinationX][destinationY - 2].getPieceType() == Type.Rook) {
+                    return (!piece.hasMoved) && (!boardArr[destinationX][destinationY - 2].hasMoved);
+                }
+            }
+        }
+        return false;
+    }
+
+    public void castleMove(int destinationX, int destinationY) {
+        if (boardArr[destinationX][destinationY + 1] != null) {
+            if (boardArr[destinationX][destinationY + 1].getPieceType() == Type.Rook) {
+                boardArr[destinationX][destinationY - 1] = boardArr[destinationX][destinationY + 1];
+                boardArr[destinationX][destinationY + 1] = null;
+            }
+        }
+        else if (boardArr[destinationX][destinationY - 2] != null) {
+            if (boardArr[destinationX][destinationY - 2].getPieceType() == Type.Rook) {
+                boardArr[destinationX][destinationY + 1] = boardArr[destinationX][destinationY - 2];
+                boardArr[destinationX][destinationY - 2] = null;
+            }
+        }
     }
 
     /*Checks if the move has been made*/

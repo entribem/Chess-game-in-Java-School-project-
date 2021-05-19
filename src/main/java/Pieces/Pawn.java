@@ -1,15 +1,17 @@
 package Pieces;
 
-import Game.Board;
 import Game.Color;
 
 
 public class Pawn extends Piece {
-    //public boolean moved2Forward;
-    public Pawn(int pieceX, int pieceY, final Color pieceColor, boolean moved2Forward) {
+    public Pawn(int pieceX, int pieceY, final Color pieceColor) {
+        super(pieceX, pieceY, pieceColor);
+    }
+
+    /*public Pawn(int pieceX, int pieceY, final Color pieceColor, boolean moved2Forward) {
         super(pieceX, pieceY, pieceColor);
         this.moved2Forward = moved2Forward;
-    }
+    }*/
 
     @Override
     public boolean isValidPath(int destinationX, int destinationY) {
@@ -22,19 +24,12 @@ public class Pawn extends Piece {
         if (pawnCanCapture(this, destinationX, destinationY)) {
             return true;
         }
-
         if (this.pieceX == 1 || this.pieceX == 6) {
             this.moved2Forward = true;
             return (xSub == 1 || xSub == 2) && (ySub == 0);
         }
         return false;
     }
-
-    public boolean hasMoved2Forward() {
-        return this.moved2Forward;
-    }
-
-
 
     @Override
     public Type getPieceType() {

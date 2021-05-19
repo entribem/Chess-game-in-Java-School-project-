@@ -15,7 +15,7 @@ public class Game {
         board = new Board(this, standardHeight, standardWidth);
         loadPlayers();
         board.loadStandardPieces();
-        turn = 1;
+        turn = 0;
     }
     /*Creates two players and randomly assigns colors*/
     public void loadPlayers() {

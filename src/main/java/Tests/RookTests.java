@@ -41,7 +41,7 @@ public class RookTests {
     public void capture() {
         Game game = new Game();
         Piece rook = new Rook(3, 3, game.player1.color);
-        new Pawn(4, 3, game.player2.color, false);
+        new Pawn(4, 3, game.player2.color);
 
         game.board.movePiece(rook, 4, 3);
         assertEquals(rook, game.board.boardArr[4][3]);

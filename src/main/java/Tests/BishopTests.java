@@ -42,7 +42,7 @@ public class BishopTests {
     public void capture() {
         Game game = new Game();
         Piece bishop = new Bishop(3, 3, game.player1.color);
-        new Pawn(4, 4, game.player2.color, false);
+        new Pawn(4, 4, game.player2.color);
 
         game.board.movePiece(bishop, 4, 4);
         assertEquals(bishop, game.board.boardArr[4][4]);
