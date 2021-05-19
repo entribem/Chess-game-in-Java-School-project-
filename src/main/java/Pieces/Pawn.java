@@ -8,11 +8,6 @@ public class Pawn extends Piece {
         super(pieceX, pieceY, pieceColor);
     }
 
-    /*public Pawn(int pieceX, int pieceY, final Color pieceColor, boolean moved2Forward) {
-        super(pieceX, pieceY, pieceColor);
-        this.moved2Forward = moved2Forward;
-    }*/
-
     @Override
     public boolean isValidPath(int destinationX, int destinationY) {
         int xSub = Math.abs(destinationX - this.pieceX);
@@ -21,9 +16,11 @@ public class Pawn extends Piece {
             return true;
         }
 
+        //if the players wants to capture with pawn
         if (pawnCanCapture(this, destinationX, destinationY)) {
             return true;
         }
+        //advance pawn by two squares
         if (this.pieceX == 1 || this.pieceX == 6) {
             this.moved2Forward = true;
             return (xSub == 1 || xSub == 2) && (ySub == 0);
@@ -36,16 +33,17 @@ public class Pawn extends Piece {
         return Type.Pawn;
     }
 
+    /**
+     * Checks if the pawn can capture
+     *
+     * @param piece         Piece to be moved
+     * @param destinationX  X coordinate of the destination square
+     * @param destinationY  Y coordinate of the destination square
+     * @return              True if the pawn can capture, false if not
+     */
     public static boolean pawnCanCapture(Piece piece, int destinationX, int destinationY) {
         int xSub = Math.abs(destinationX - piece.pieceX);
         int ySub = Math.abs(destinationY - piece.pieceY);
         return (xSub == 1) && (ySub == 1);
     }
-
-    /*public static boolean pawnCanEnPassant(Piece piece, int destinationX, int destinationY) {
-        if (pawnCanCapture(piece, destinationX, destinationY)) {
-
-        }
-    }*/
-
 }

@@ -1,7 +1,6 @@
 package Pieces;
 
 import Game.Color;
-import Game.Player;
 
 public class Bishop extends Piece {
     public Bishop(int pieceX, int pieceY, final Color pieceColor) {
@@ -18,10 +17,5 @@ public class Bishop extends Piece {
     @Override
     public Type getPieceType() {
         return Type.Bishop;
-    }
-
-    @Override
-    public Color getPieceColor() {
-        return this.pieceColor;
     }
 }

@@ -2,7 +2,6 @@ package GUI;
 
 import Pieces.*;
 import Game.*;
-
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -19,16 +18,29 @@ import static javax.swing.SwingUtilities.*;
 public class BoardGui {
     Game game;
     Player currentPlayer;
-    boolean endTurn = false;
+    /**
+     * If the turn has ended
+     */
+    public boolean endTurn = false;
     private final JFrame gameFrame;
     private final Board chessBoard;
     private static String pieceIconPath = "src/main/java/GUI/Icons/";
+    //the size of the board panel
     private final static Dimension BOARD_PANEL_DIMENSION = new Dimension(400,350);
+    //the size of the square panel
     private final static Dimension SQUARE_PANEL_DIMENSION = new Dimension(10, 10);
-    private Piece sourceSquare;
-    private Piece destinationSquare;
-    private Piece movedPiece;
+    /**
+     * Piece, which player wants to move
+     */
+    public Piece sourceSquare;
+    /**
+     * Square, where players wants to move his piece
+     */
+    public Piece destinationSquare;
 
+    /**
+     * Waits for the end of other players turn
+     */
     public synchronized void waitForInput()
     {
         while(!endTurn)
@@ -41,6 +53,9 @@ public class BoardGui {
         }
     }
 
+    /**
+     * Notifies that the player has ended their turn
+     */
     public synchronized void notifyInput()
     {
         endTurn = true;
@@ -54,45 +69,19 @@ public class BoardGui {
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameFrame.setSize(600, 600);
         gameFrame.setLayout(new BorderLayout());
-        final JMenuBar menuBar = new JMenuBar();
-        fillMenu(menuBar);
-        this.gameFrame.setJMenuBar(menuBar);
         BoardPanel panel = new BoardPanel();
-        //gameFrame.getContentPane().add(panel, BorderLayout.CENTER);
         gameFrame.add(panel, BorderLayout.CENTER);
-        //gameFrame.setContentPane(panel);
         gameFrame.setVisible(true);
-    }
-
-    private void fillMenu(final JMenuBar menuBar) {
-        menuBar.add(createFileMenu());
-    }
-
-    private JMenu createFileMenu() {
-        final JMenu fileMenu = new JMenu("File");
-        final JMenuItem loadPGN = new JMenuItem("Load game");
-        loadPGN.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
-        fileMenu.add(loadPGN);
-        final JMenuItem savePGN = new JMenuItem("Save game");
-        savePGN.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-            }
-        });
-        fileMenu.add(savePGN);
-        return fileMenu;
     }
 
     public class BoardPanel extends JPanel {
         final List<SquarePanel> boardSquares;
 
+        /**
+         * Represents board
+         */
         public BoardPanel() {
+            //draws board
             setLayout(new GridLayout(chessBoard.height, chessBoard.width));
             boardSquares = new ArrayList<>();
             for (int i = 0; i < chessBoard.height * chessBoard.width; ++i) {
@@ -104,7 +93,11 @@ public class BoardGui {
             validate();
         }
 
-
+        /**
+         * Redraws the updated board
+         *
+         * @param board Board to be redrawn
+         */
         public void redrawBoard(Board board) {
             removeAll();
             for (SquarePanel squarePanel : boardSquares) {
@@ -116,7 +109,10 @@ public class BoardGui {
         }
     }
 
-    private class SquarePanel extends JPanel {
+    /**
+     * Represents squares on the board
+     */
+    public class SquarePanel extends JPanel {
         private final int squareNum;
 
         public SquarePanel(final int squareNum, final BoardPanel boardPanel) {
@@ -130,56 +126,49 @@ public class BoardGui {
             addMouseListener(new MouseListener() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    if (isLeftMouseButton(e)) {
-                        if (sourceSquare == null) {
-                            sourceSquare = chessBoard.getSquare(squareNum);
-                            if (sourceSquare.pieceColor != currentPlayer.color) {
-                                sourceSquare = null;
-                                System.out.println("Invalid move, wrong player");
-                            }
+                    if (!currentPlayer.isComputer) {
+                        if (isLeftMouseButton(e)) {
+                            if (sourceSquare == null) {
+                                sourceSquare = chessBoard.getSquare(squareNum);
+                                //checks if the player tries to move other players pieces
+                                if (sourceSquare.pieceColor != currentPlayer.color) {
+                                    sourceSquare = null;
+                                    System.out.println("Invalid move, wrong player");
+                                }
+                                System.out.println("source square = " + sourceSquare);
 
-                            movedPiece = sourceSquare;
-                            System.out.println("square num = " + squareNum);
-                            System.out.println("source square = " + sourceSquare);
-                            //System.out.println("square num = " + squareNum);
-                            if (movedPiece == null) {
+                            } else {
+                                destinationSquare = chessBoard.getSquare(squareNum);
+                                System.out.println("destination square = " + destinationSquare);
+                                int row = squareNum / 8;
+                                int col = squareNum - (row * 8);
+                               // int pieceX = sourceSquare.pieceX;
+                                int pieceY = sourceSquare.pieceY;
+                                //tries to move the piece
+                                chessBoard.movePiece(sourceSquare, row, col);
+                                //Notifies the other player and saves the move
+                                if (chessBoard.moveSuccessful(sourceSquare, row, col)) {
+                                    endTurn = true;
+                                    notifyInput();
+                                    saveMove(destinationSquare, sourceSquare, pieceY, chessBoard);
+                                }
+                                System.out.println(chessBoard.boardArr[row][col]);
+                                //tries to promote the pawn if possible
+                                if (sourceSquare.getPieceType() == Type.Pawn) {
+                                    chessBoard.promotePawn(sourceSquare);
+                                }
                                 sourceSquare = null;
+                                destinationSquare = null;
                             }
                         }
-                        else {
-                            destinationSquare = chessBoard.getSquare(squareNum);
-                            System.out.println("square num = " + squareNum);
-                            //System.out.println("source square = " + sourceSquare);
-                            //System.out.println("Color = " + sourceSquare.pieceColor);
-                            System.out.println("destination square = " + destinationSquare);
-                            int row = squareNum / 8;
-                            int col = squareNum - (row * 8);
-                            int pieceX = sourceSquare.pieceX;
-                            int pieceY = sourceSquare.pieceY;
-                            movedPiece = sourceSquare;
-                            chessBoard.movePiece(sourceSquare, row, col);
-                            if (chessBoard.moveSuccessful(sourceSquare, row, col)) {
-                                notifyInput();
-                                System.out.println("movedPiece = " + movedPiece.pieceX + movedPiece.pieceY + " sourceSquare = " + sourceSquare.pieceX + sourceSquare.pieceY);
-                                saveMove(destinationSquare, sourceSquare, pieceX, pieceY, chessBoard);
-                            }
-                            System.out.println(chessBoard.boardArr[row][col]);
-                            /*trys to promote pawn if possible*/
-                            chessBoard.promotePawn(sourceSquare);
-
+                        //cancel the choice of the piece by pressing right mouse button
+                        else if (isRightMouseButton(e)) {
                             sourceSquare = null;
                             destinationSquare = null;
-                            movedPiece = null;
                         }
-                    }
-                    else if (isRightMouseButton(e)) {
-                        sourceSquare = null;
-                        destinationSquare = null;
-                        movedPiece = null;
-                    }
-                    invokeLater(() -> {
+                        //updates the board with the new move
                         boardPanel.redrawBoard(chessBoard);
-                    });
+                    }
 
                 }
 
@@ -206,11 +195,16 @@ public class BoardGui {
             validate();
         }
 
-        private void placeFigure(Board board) {
+        /**
+         * Loads an image of the piece and puts it on a square
+         *
+         * @param board Board
+         */
+        public void placeFigure(Board board) {
             try {
                 Piece piece;
                 if ((piece = board.getSquare(this.squareNum)) != null) {
-                    Image icon = ImageIO.read(new File(pieceIconPath + piece.getPieceColor()
+                    Image icon = ImageIO.read(new File(pieceIconPath + piece.pieceColor
                             + piece.getPieceType() + ".png"));
                     add(new JLabel(new ImageIcon(icon)));
                 }
@@ -219,7 +213,10 @@ public class BoardGui {
             }
         }
 
-        private void paintSquare() {
+        /**
+         * Paints the square xlight or dark
+         */
+        public void paintSquare() {
             this.removeAll();
             if ((this.squareNum / 8) % 2 == 0) {
                 if ((this.squareNum % 2) == 0) {
@@ -236,6 +233,11 @@ public class BoardGui {
             }
         }
 
+        /**
+         * Paints square and puts an image of the piece
+         *
+         * @param board Board
+         */
         public void drawSquare(final Board board) {
             paintSquare();
             placeFigure(board);
@@ -244,9 +246,58 @@ public class BoardGui {
         }
     }
 
+    /*public void computerMove() {
+        endTurn = false;
 
-    /*public static void main(String args[]) {
-        Chess chess = new Chess();
-        chess.startGame();
+        Piece piece = chessBoard.whitePieces.get(0);
+        for (int i = 0; i < 16; i++) {
+            if (currentPlayer.color == piece.pieceColor) {
+                piece = chessBoard.whitePieces.get(i);
+            } else {
+                piece = chessBoard.blackPieces.get(i);
+            }
+            System.out.println("DEBUG = " + piece);
+            int sourceX = piece.pieceX;
+            int sourceY = piece.pieceY;
+            System.out.println("sourceX = " + sourceX + " sourceY = " + sourceY);
+            sourceSquare = piece;
+            if (piece.getPieceType() == Type.Rook || piece.getPieceType() == Type.Queen) {
+                for (int k = 0; k < piece.pieceX; ++k) {
+                    chessBoard.movePiece(piece, k, piece.pieceY);
+                    if (chessBoard.moveSuccessful(piece, k, piece.pieceY)) {
+                        destinationSquare = piece;
+                        endTurn = true;
+                        //notifyInput();
+                        saveMove(destinationSquare, sourceSquare, sourceX, sourceY, chessBoard);
+                        break;
+                    }
+
+                    chessBoard.movePiece(piece, piece.pieceX, k);
+                    if (chessBoard.moveSuccessful(piece, piece.pieceX, k)) {
+                        destinationSquare = piece;
+                        endTurn = true;
+                        //notifyInput();
+                        saveMove(destinationSquare, sourceSquare, sourceX, sourceY, chessBoard);
+                        break;
+                    }
+                }
+            }
+
+            else if (piece.getPieceType() == Type.Pawn) {
+                chessBoard.movePiece(piece, piece.pieceX + 1, piece.pieceY);
+                if (chessBoard.moveSuccessful(piece, piece.pieceX + 1, piece.pieceY)) {
+                    destinationSquare = piece;
+                    endTurn = true;
+                    //notifyInput();
+                    saveMove(destinationSquare, sourceSquare, sourceX, sourceY, chessBoard);
+                }
+            }
+
+            if (endTurn) {
+                System.out.println("lalla");
+                break;
+            }
+
+        }
     }*/
 }

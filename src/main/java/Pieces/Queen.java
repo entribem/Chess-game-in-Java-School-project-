@@ -1,7 +1,6 @@
 package Pieces;
 
 import Game.Color;
-import Game.Player;
 
 public class Queen extends Piece {
     public Queen(int pieceX, int pieceY, final Color pieceColor) {

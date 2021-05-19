@@ -2,22 +2,49 @@ package Game;
 import java.util.Random;
 
 public class Game {
-    public Player player1, player2;
+    /**
+     * First player
+     */
+    public Player player1;
+
+    /**
+     * Second player
+     */
+    public Player player2;
     public Board board;
+
+    /**
+     * Turn
+     */
     public int turn;
-    final static int standardHeight = 8, standardWidth = 8;
+
+    /**
+     * Standard height of the board, which is 8
+     */
+    final static int standardHeight = 8;
+
+    /**
+     * Standard width of the board, which is 8
+     */
+    final static int standardWidth = 8;
 
     public Game() {
         loadGame();
     }
 
+    /**
+     * Creates board, loads players and pieces
+     */
     public void loadGame() {
         board = new Board(this, standardHeight, standardWidth);
         loadPlayers();
         board.loadStandardPieces();
         turn = 0;
     }
-    /*Creates two players and randomly assigns colors*/
+
+    /**
+     * Creates two players and randomly assigns colors
+     */
     public void loadPlayers() {
         Random rand = new Random();
         int randomNum = rand.nextInt(2);
