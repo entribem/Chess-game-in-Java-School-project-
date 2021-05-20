@@ -21,7 +21,7 @@ public abstract class Piece {
     /**
      Utility variable for en passant move
      * which indicates
-     * if the pawn has advanced two squares
+     * if the pawn has advanced by two squares
      */
     public boolean moved2Forward;
 
@@ -43,7 +43,7 @@ public abstract class Piece {
      *
      * @param destinationX  X coordinate of the square, where player wants to move
      * @param destinationY  Y coordinate of the square, where player wants to move
-     * @return              true if the path is valid, false if is not
+     * @return              True if the path is valid, false if is not
      */
     public abstract boolean isValidPath(int destinationX, int destinationY);
 

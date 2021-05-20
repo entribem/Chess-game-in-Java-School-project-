@@ -130,11 +130,12 @@ public class Board {
      */
     public void movePiece(Piece piece, int destinationX, int destinationY) {
         if (piece.isValidPath(destinationX, destinationY) && isMoveValid(piece, destinationX, destinationY)) {
-            if (pawnCanEnPassant(piece) && piece.pieceColor == game.player1.color) { //En passant for player 1
-                boardArr[destinationX + 1][destinationY] = null;
-            }
-            else if (pawnCanEnPassant(piece) && piece.pieceColor == game.player2.color) { //En passant for player 2
-                boardArr[destinationX - 1][destinationY] = null;
+            if (piece.getPieceType() == Type.Pawn) {
+                if (pawnCanEnPassant(piece) && piece.pieceColor == game.player1.color) { //En passant for player 1
+                    boardArr[destinationX + 1][destinationY] = null;
+                } else if (pawnCanEnPassant(piece) && piece.pieceColor == game.player2.color) { //En passant for player 2
+                    boardArr[destinationX - 1][destinationY] = null;
+                }
             }
             if (piece.getPieceType() == Type.King) {
                 if (kingCanCastle(piece, destinationX, destinationY)) { //checks if the king can castle
@@ -184,17 +185,19 @@ public class Board {
      */
     public boolean isMoveValid(Piece piece, int destinationX, int destinationY) {
         if (piece.getPieceType() == Type.Pawn) {
-            //
             if (!Pawn.pawnCanCapture(piece, destinationX, destinationY) && boardArr[destinationX][destinationY] != null) {
                 return false;
             }
         }
 
+        //pawn can not move sideways if it can not capture or en passant
         if (piece.getPieceType() == Type.Pawn && Pawn.pawnCanCapture(piece, destinationX, destinationY)
             && boardArr[destinationX][destinationY] == null && !pawnCanEnPassant(piece)) {
             return false;
         }
-        return isDestinationValid(piece, destinationX, destinationY) && isLeapingValid(piece, destinationX, destinationY);
+
+        return isDestinationValid(piece, destinationX, destinationY) &&
+                isLeapingValid(piece, destinationX, destinationY);
     }
 
     /**
@@ -230,11 +233,25 @@ public class Board {
             return true;
         }
         else {
+            //piece can not capture pieces of the same color
             if (boardArr[destinationX][destinationY].pieceColor == piece.pieceColor) {
                 return false;
             }
         }
         return true;
+    }
+
+    /**
+     * Checks if the destination square is the same as source square
+     *
+     * @param piece         Piece to be moved
+     * @param destinationX  X coordinate of the destination square
+     * @param destinationY  Y coordinate of the destination square
+     * @return              True if the destination square is the same as source square, false if is not
+     */
+    public boolean isOriginSquare(Piece piece, int destinationX, int destinationY)
+    {
+        return (piece.pieceX == destinationX) && (piece.pieceY == destinationY);
     }
 
     /**
@@ -262,7 +279,7 @@ public class Board {
             return true;
         }
 
-        //tests if there are any pieces in the way
+        //tests if there are any pieces in the way for all directions
         if (ySub == 0) {
             if (xSub > 0) {
                 for (int i = x + 1; i < destinationX; ++i) {
@@ -326,6 +343,12 @@ public class Board {
         return true;
     }
 
+    /**
+     * Gets the square and the piece on it with the given coordinate
+     *
+     * @param coordinate    Coordinate of the square
+     * @return              Square and the piece on it
+     */
     public Piece getSquare(int coordinate) {
         int row = coordinate / 8;
         int col = coordinate - (row * 8);
@@ -364,18 +387,18 @@ public class Board {
      * Checks if the pawn can perform en passant move
      *
      * @param piece     Piece to make en passant
-     * @return          true if pawn can mak en passant move, false if can not
+     * @return          true if pawn can make en passant move, false if can not
      */
     public boolean pawnCanEnPassant(Piece piece) {
+        //pawn can make en passant on another pawn if it has advanced by 2 squares
         if (piece.pieceY != 7) {
             if (boardArr[piece.pieceX][piece.pieceY + 1] != null) {
                 if (boardArr[piece.pieceX][piece.pieceY + 1].getPieceType() == Type.Pawn &&
                         boardArr[piece.pieceX][piece.pieceY + 1].pieceColor != piece.pieceColor) {
-                    System.out.println(piece.pieceX);
                     return boardArr[piece.pieceX][piece.pieceY + 1].moved2Forward;
-
                 }
-            } else if (boardArr[piece.pieceX][piece.pieceY - 1] != null) {
+            }
+            else if (boardArr[piece.pieceX][piece.pieceY - 1] != null) {
                 if (boardArr[piece.pieceX][piece.pieceY - 1].getPieceType() == Type.Pawn &&
                         boardArr[piece.pieceX][piece.pieceY - 1].pieceColor != piece.pieceColor) {
                     return boardArr[piece.pieceX][piece.pieceY - 1].moved2Forward;
@@ -394,6 +417,7 @@ public class Board {
      * @return              True if king can mak castling move, false if can not
      */
     public boolean kingCanCastle(Piece piece, int destinationX, int destinationY) {
+        //king can castle if king and rook have not made any moves
         if (boardArr[destinationX][destinationY + 1] != null || boardArr[destinationX][destinationY - 2] != null) {
             if (destinationY > piece.pieceY) {
                 if (boardArr[destinationX][destinationY + 1].getPieceType() == Type.Rook) {
