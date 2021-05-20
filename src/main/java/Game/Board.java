@@ -403,7 +403,9 @@ public class Board {
                     return boardArr[piece.pieceX][piece.pieceY + 1].moved2Forward;
                 }
             }
-            else if (boardArr[piece.pieceX][piece.pieceY - 1] != null) {
+        }
+        else {
+            if (boardArr[piece.pieceX][piece.pieceY - 1] != null) {
                 if (boardArr[piece.pieceX][piece.pieceY - 1].getPieceType() == Type.Pawn &&
                         boardArr[piece.pieceX][piece.pieceY - 1].pieceColor != piece.pieceColor) {
                     return boardArr[piece.pieceX][piece.pieceY - 1].moved2Forward;
