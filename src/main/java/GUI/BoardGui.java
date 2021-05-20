@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static PGN.PGNUtilities.saveMove;
 import static javax.swing.SwingUtilities.*;
@@ -24,7 +26,9 @@ public class BoardGui {
     public boolean endTurn = false;
     private final JFrame gameFrame;
     private final Board chessBoard;
+    //path to the piece icons
     private static String pieceIconPath = "src/main/java/GUI/Icons/";
+    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
     //the size of the board panel
     private final static Dimension BOARD_PANEL_DIMENSION = new Dimension(400,350);
     //the size of the square panel
@@ -135,22 +139,25 @@ public class BoardGui {
                             if (sourceSquare == null) {
                                 //chooses the piece which player wants to move
                                 sourceSquare = chessBoard.getSquare(squareNum);
-                                //checks if the player tries to move other players pieces
-                                if (sourceSquare != null) {
+                                //checks if the player tries to move from empty square
+                                if (sourceSquare == null) {
+                                    LOGGER.log(Level.WARNING, "Empty square, choose another");
+                                }
+                                else {
+                                    //checks if the player tries to move other players pieces
                                     if (sourceSquare.pieceColor != currentPlayer.color) {
                                         sourceSquare = null;
-                                        System.out.println("Invalid move, wrong player");
+                                        LOGGER.log(Level.WARNING, "Invalid move, can not move other players pieces");
                                     }
-                                    System.out.println("source square = " + sourceSquare);
+                                    LOGGER.log(Level.INFO, "Source square = " + sourceSquare);
                                 }
-
-                            } else {
+                            }
+                            else {
                                 //chooses where player wants to move their piece
                                 destinationSquare = chessBoard.getSquare(squareNum);
-                                System.out.println("destination square = " + destinationSquare);
+                                LOGGER.log(Level.INFO, "Destination square = " + destinationSquare);
                                 int row = squareNum / 8;
                                 int col = squareNum - (row * 8);
-                               // int pieceX = sourceSquare.pieceX;
                                 int pieceY = sourceSquare.pieceY;
                                 //if the destination square is not the same as a source square
                                 if (!chessBoard.isOriginSquare(sourceSquare, row, col)) {
@@ -163,7 +170,7 @@ public class BoardGui {
                                         saveMove(destinationSquare, sourceSquare, pieceY, chessBoard);
                                     }
                                 }
-                                System.out.println(chessBoard.boardArr[row][col]);
+
                                 //tries to promote the pawn if possible
                                 if (sourceSquare.getPieceType() == Type.Pawn) {
                                     chessBoard.promotePawn(sourceSquare);
@@ -306,7 +313,7 @@ public class BoardGui {
             }
 
             if (endTurn) {
-                System.out.println("lalla");
+                System.out.println("h");
                 break;
             }
 

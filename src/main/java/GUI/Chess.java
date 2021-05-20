@@ -3,12 +3,11 @@ import PGN.PGNUtilities;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Chess {
-    /*
-    public boolean againstHuman;
-    public boolean standardBoard;
-    */
+    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
 
     public static void main(String[] args) {
@@ -59,7 +58,7 @@ public class Chess {
             if (gui.game.player1.hasLost || gui.game.player2.hasLost) {
                 break;
             }
-            System.out.println(gui.currentPlayer.color + " Turn");
+            LOGGER.log(Level.INFO, gui.currentPlayer.color + " turn");
             //waits for the other player to finish his move
             gui.waitForInput();
             gui.currentPlayer.isTurn = false;
@@ -84,7 +83,7 @@ public class Chess {
         }
         //saves match to pgn file
         else {
-            System.out.println("SAVING GAME");
+            LOGGER.log(Level.INFO, "Saving game to PGN file");
             try {
                 PGNUtilities.writeGameToPGNFile();
             } catch (IOException e) {

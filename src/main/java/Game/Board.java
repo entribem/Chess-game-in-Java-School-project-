@@ -3,6 +3,8 @@ package Game;
 import Pieces.*;
 
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Board {
     public Game game;
@@ -21,6 +23,8 @@ public class Board {
      */
     public Piece[][] boardArr;
 
+    private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+
     /*public Vector<Piece> whitePieces = new Vector<Piece>(16);
     public Vector<Piece> blackPieces = new Vector<Piece>(16);*/
 
@@ -29,6 +33,7 @@ public class Board {
         this.height = height;
         this.width = width;
         boardArr = new Piece[height][width];
+
     }
 
     /**
@@ -150,7 +155,7 @@ public class Board {
             setPieceLocation(piece, destinationX, destinationY);
         }
         else {
-            System.out.println("invalid move");
+            LOGGER.log(Level.WARNING, "Invalid move");
         }
     }
 
@@ -211,10 +216,10 @@ public class Board {
             if (boardArr[destinationX][destinationY].getPieceType() == Type.King) {
                 if (boardArr[destinationX][destinationY].pieceColor == game.player1.color) {
                     game.player1.hasLost = true;
-                    System.out.println("PLAYER 1 HAS LOST");
+                    LOGGER.log(Level.INFO, "PLAYER 1 HAS LOST");
                 } else if (boardArr[destinationX][destinationY].pieceColor == game.player2.color) {
                     game.player2.hasLost = true;
-                    System.out.println("PLAYER 2 HAS LOST");
+                    LOGGER.log(Level.INFO, "PLAYER 2 HAS LOST");
                 }
             }
         }
