@@ -1,16 +1,15 @@
 package Game;
 
+import Pieces.Piece;
+
+import java.util.Vector;
+
 public class Player {
+    public Game game;
     /**
      * Color of the players pieces
      */
     public Color color;
-
-    /**
-     * If the player goes first
-     */
-    public boolean goesFirst;
-    public Game game;
 
     /**
      * If the player has lost
@@ -27,8 +26,26 @@ public class Player {
      */
     public boolean isComputer = false;
 
-    public Player(Color color, boolean goesFirst) {
+    public Player(Color color) {
         this.color = color;
-        this.goesFirst = goesFirst;
+    }
+
+    /**
+     * Gets all enemy pieces
+     *
+     * @param color Player Color
+     * @return      Vector containing enemy pieces
+     */
+    public Vector<Piece> getEnemyPieces(Color color)
+    {
+        Vector<Piece> enemyPieces;
+
+        if(color == Color.WHITE) {
+            enemyPieces = game.board.blackPieces;
+        }
+        else {
+            enemyPieces = game.board.whitePieces;
+        }
+        return enemyPieces;
     }
 }

@@ -7,6 +7,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Board {
+    /**
+     * If the king is in check
+     */
+    public boolean kingCheck;
     public Game game;
     /**
      * Height of the board
@@ -25,8 +29,14 @@ public class Board {
 
     private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
-    /*public Vector<Piece> whitePieces = new Vector<Piece>(16);
-    public Vector<Piece> blackPieces = new Vector<Piece>(16);*/
+    /**
+     * Vector containing all white pieces
+     */
+    public Vector<Piece> whitePieces = new Vector<Piece>(16);
+    /**
+     * Vector containing all black pieces
+     */
+    public Vector<Piece> blackPieces = new Vector<Piece>(16);
 
     public Board(Game game, int height, int width) {
         this.game = game;
@@ -42,7 +52,7 @@ public class Board {
     public void loadStandardPieces() {
         loadPiecesPlayer1();
         loadPiecesPlayer2();
-        //setPieceVectors();
+        setPieceVectors();
     }
 
     /**
@@ -50,29 +60,29 @@ public class Board {
      */
     public void loadPiecesPlayer2() {
         for (int i = 0; i < width; ++i) {
-            Piece pawn = new Pawn(1, i, game.player2.color);
+            Piece pawn = new Pawn(1, i, game.player2);
             boardArr[1][i] = pawn;
         }
 
-        Piece knight = new Knight(0, 1, game.player2.color);
-        Piece knight1 = new Knight(0, 6, game.player2.color);
+        Piece knight = new Knight(0, 1, game.player2);
+        Piece knight1 = new Knight(0, 6, game.player2);
         boardArr[0][1] = knight;
         boardArr[0][6] = knight1;
 
-        Piece rook = new Rook(0, 0, game.player2.color);
-        Piece rook1 = new Rook(0, 7, game.player2.color);
+        Piece rook = new Rook(0, 0, game.player2);
+        Piece rook1 = new Rook(0, 7, game.player2);
         boardArr[0][0] = rook;
         boardArr[0][7] = rook1;
 
-        Piece bishop = new Bishop(0, 2, game.player2.color);
-        Piece bishop1 = new Bishop(0, 5, game.player2.color);
+        Piece bishop = new Bishop(0, 2, game.player2);
+        Piece bishop1 = new Bishop(0, 5, game.player2);
         boardArr[0][2] = bishop;
         boardArr[0][5] = bishop1;
 
-        Piece queen = new Queen(0, 3, game.player2.color);
+        Piece queen = new Queen(0, 3, game.player2);
         boardArr[0][3] = queen;
 
-        Piece king = new King(0, 4, game.player2.color);
+        Piece king = new King(0, 4, game.player2);
         boardArr[0][4] = king;
     }
 
@@ -81,80 +91,79 @@ public class Board {
      */
     public void loadPiecesPlayer1() {
         for (int i = 0; i < width; ++i) {
-            Piece pawn = new Pawn(6, i, game.player1.color);
+            Piece pawn = new Pawn(6, i, game.player1);
             boardArr[6][i] = pawn;
         }
 
-        Piece knight = new Knight(7, 1, game.player1.color);
-        Piece knight1 = new Knight(7, 6, game.player1.color);
+        Piece knight = new Knight(7, 1, game.player1);
+        Piece knight1 = new Knight(7, 6, game.player1);
         boardArr[7][1] = knight;
         boardArr[7][6] = knight1;
 
-        Piece rook = new Rook(7, 0, game.player1.color);
-        Piece rook1 = new Rook(7, 7, game.player1.color);
+        Piece rook = new Rook(7, 0, game.player1);
+        Piece rook1 = new Rook(7, 7, game.player1);
         boardArr[7][0] = rook;
         boardArr[7][7] = rook1;
 
-        Piece bishop = new Bishop(7, 2, game.player1.color);
-        Piece bishop1 = new Bishop(7, 5, game.player1.color);
+        Piece bishop = new Bishop(7, 2, game.player1);
+        Piece bishop1 = new Bishop(7, 5, game.player1);
         boardArr[7][2] = bishop;
         boardArr[7][5] = bishop1;
 
-        Piece queen = new Queen(7, 3, game.player1.color);
+        Piece queen = new Queen(7, 3, game.player1);
         boardArr[7][3] = queen;
 
-        Piece king = new King(7, 4, game.player1.color);
+        Piece king = new King(7, 4, game.player1);
         boardArr[7][4] = king;
     }
 
-    /*public void setPieceVectors()
-    {
-        for (int i = 0; i < 8; i++)
-        {
-            if (game.player1.color == Color.white) {
-                whitePieces.add(this.boardArr[i][6]);
-                whitePieces.add(this.boardArr[i][7]);
-                blackPieces.add(this.boardArr[i][0]);
-                blackPieces.add(this.boardArr[i][1]);
-            }
-            else {
-                whitePieces.add(this.boardArr[i][0]);
-                whitePieces.add(this.boardArr[i][1]);
-                blackPieces.add(this.boardArr[i][6]);
-                blackPieces.add(this.boardArr[i][7]);
+    /**
+     * Add pieces to the vectors
+     */
+    public void setPieceVectors() {
+        for (int i = 0; i < 8; i++) {
+            if (game.player1.color == Color.WHITE) {
+                whitePieces.add(this.boardArr[6][i]);
+                whitePieces.add(this.boardArr[7][i]);
+                blackPieces.add(this.boardArr[0][i]);
+                blackPieces.add(this.boardArr[1][i]);
+            } else {
+                whitePieces.add(this.boardArr[0][i]);
+                whitePieces.add(this.boardArr[1][i]);
+                blackPieces.add(this.boardArr[6][i]);
+                blackPieces.add(this.boardArr[7][i]);
             }
         }
-    }*/
+    }
 
     /**
      * Moves the piece if the move is correct
      *
-     * @param piece         Piece to be moved
-     * @param destinationX  X coordinate of the destination square
-     * @param destinationY  Y coordinate of the destination square
+     * @param piece        Piece to be moved
+     * @param destinationX X coordinate of the destination square
+     * @param destinationY Y coordinate of the destination square
      */
     public void movePiece(Piece piece, int destinationX, int destinationY) {
         if (piece.isValidPath(destinationX, destinationY) && isMoveValid(piece, destinationX, destinationY)) {
-            if (piece.getPieceType() == Type.Pawn) {
-                if (pawnCanEnPassant(piece) && piece.pieceColor == game.player1.color) { //En passant for player 1
+            if (piece.getPieceType() == Type.PAWN) {
+                if (Pawn.pawnCanEnPassant(piece) && piece.player.color == game.player1.color) { //En passant for player 1
                     boardArr[destinationX + 1][destinationY] = null;
-                } else if (pawnCanEnPassant(piece) && piece.pieceColor == game.player2.color) { //En passant for player 2
+                } else if (Pawn.pawnCanEnPassant(piece) && piece.player.color == game.player2.color) { //En passant for player 2
                     boardArr[destinationX - 1][destinationY] = null;
                 }
             }
-            if (piece.getPieceType() == Type.King) {
-                if (kingCanCastle(piece, destinationX, destinationY)) { //checks if the king can castle
-                    castleMove(destinationX, destinationY);
+            if (piece.getPieceType() == Type.KING) {
+                if (King.kingCanCastle(piece, destinationX, destinationY)) { //checks if the king can castle
+                    King.castleMove(piece, destinationX, destinationY);
                 }
             }
 
-            if (piece.getPieceType() == Type.King || piece.getPieceType() == Type.Rook) {
+            if (piece.getPieceType() == Type.KING || piece.getPieceType() == Type.ROOK) {
                 piece.hasMoved = true;
             }
 
             setPieceLocation(piece, destinationX, destinationY);
-        }
-        else {
+        } else {
             LOGGER.log(Level.WARNING, "Invalid move");
         }
     }
@@ -162,15 +171,23 @@ public class Board {
     /**
      * Moves piece to the new location
      *
-     * @param piece         Piece to be moved
-     * @param destinationX  X coordinate of the destination square
-     * @param destinationY  Y coordinate of the destination square
+     * @param piece        Piece to be moved
+     * @param destinationX X coordinate of the destination square
+     * @param destinationY Y coordinate of the destination square
      */
     public void setPieceLocation(Piece piece, int destinationX, int destinationY) {
+        if (boardArr[destinationX][destinationY] != null) {
+            if (boardArr[destinationX][destinationY].player.color == Color.WHITE) {
+                whitePieces.remove(boardArr[destinationX][destinationY]);
+            } else {
+                blackPieces.remove(boardArr[destinationX][destinationY]);
+            }
+        }
+
         int sourceX = piece.pieceX;
         int sourceY = piece.pieceY;
 
-        canCaptureKing(destinationX, destinationY);
+        isGoingToCaptureKing(destinationX, destinationY);
 
         piece.pieceX = destinationX;
         piece.pieceY = destinationY;
@@ -183,21 +200,44 @@ public class Board {
     /**
      * Checks if the move is valid
      *
-     * @param piece         Piece to be moved
-     * @param destinationX  X coordinate of the destination square
-     * @param destinationY  Y coordinate of the destination square
-     * @return              True if the move is valid, false if is not
+     * @param piece        Piece to be moved
+     * @param destinationX X coordinate of the destination square
+     * @param destinationY Y coordinate of the destination square
+     * @return True if the move is valid, false if is not
      */
     public boolean isMoveValid(Piece piece, int destinationX, int destinationY) {
-        if (piece.getPieceType() == Type.Pawn) {
-            if (!Pawn.pawnCanCapture(piece, destinationX, destinationY) && boardArr[destinationX][destinationY] != null) {
+
+        if (piece.getPieceType() != Type.KING) {
+            Piece king = King.findKing(piece.player);
+
+            if (King.kingInCheck(piece, king.pieceX, king.pieceY) &&
+                    !King.allyCanDefendKing(piece, king, destinationX, destinationY)) {
+                LOGGER.log(Level.WARNING, "King is in check");
+                kingCheck = true;
+                if (King.isCheckmate(king)) {
+                    if (king.player.color == Color.WHITE) {
+                        game.player1.hasLost = true;
+                        LOGGER.log(Level.INFO, "PLAYER 1 HAS LOST");
+                    }
+                    else {
+                        game.player2.hasLost = true;
+                        LOGGER.log(Level.INFO, "PLAYER 2 HAS LOST");
+                    }
+                }
+                return false;
+            }
+        }
+
+        if (piece.getPieceType() == Type.PAWN) {
+            if (!Pawn.pawnCanCapture(piece, destinationX, destinationY) &&
+                    boardArr[destinationX][destinationY] != null) {
                 return false;
             }
         }
 
         //pawn can not move sideways if it can not capture or en passant
-        if (piece.getPieceType() == Type.Pawn && Pawn.pawnCanCapture(piece, destinationX, destinationY)
-            && boardArr[destinationX][destinationY] == null && !pawnCanEnPassant(piece)) {
+        if (piece.getPieceType() == Type.PAWN && Pawn.pawnCanCapture(piece, destinationX, destinationY)
+                && boardArr[destinationX][destinationY] == null && !Pawn.pawnCanEnPassant(piece)) {
             return false;
         }
 
@@ -208,16 +248,16 @@ public class Board {
     /**
      * Checks if the king is going to be captured and sets loser
      *
-     * @param destinationX  X coordinate of the destination square
-     * @param destinationY  Y coordinate of the destination square
+     * @param destinationX X coordinate of the destination square
+     * @param destinationY Y coordinate of the destination square
      */
-    public void canCaptureKing(int destinationX, int destinationY) {
+    public void isGoingToCaptureKing(int destinationX, int destinationY) {
         if (boardArr[destinationX][destinationY] != null) {
-            if (boardArr[destinationX][destinationY].getPieceType() == Type.King) {
-                if (boardArr[destinationX][destinationY].pieceColor == game.player1.color) {
+            if (boardArr[destinationX][destinationY].getPieceType() == Type.KING) {
+                if (boardArr[destinationX][destinationY].player.color == game.player1.color) {
                     game.player1.hasLost = true;
                     LOGGER.log(Level.INFO, "PLAYER 1 HAS LOST");
-                } else if (boardArr[destinationX][destinationY].pieceColor == game.player2.color) {
+                } else if (boardArr[destinationX][destinationY].player.color == game.player2.color) {
                     game.player2.hasLost = true;
                     LOGGER.log(Level.INFO, "PLAYER 2 HAS LOST");
                 }
@@ -228,18 +268,17 @@ public class Board {
     /**
      * Checks if the square is not occupied by the piece of the same color
      *
-     * @param piece         Piece to be moved
-     * @param destinationX  X coordinate of the destination square
-     * @param destinationY  Y coordinate of the destination square
-     * @return              False if occupied by the piece of the same color, true if not
+     * @param piece        Piece to be moved
+     * @param destinationX X coordinate of the destination square
+     * @param destinationY Y coordinate of the destination square
+     * @return False if occupied by the piece of the same color, true if not
      */
     public boolean isDestinationValid(Piece piece, int destinationX, int destinationY) {
         if (boardArr[destinationX][destinationY] == null) {
             return true;
-        }
-        else {
+        } else {
             //piece can not capture pieces of the same color
-            if (boardArr[destinationX][destinationY].pieceColor == piece.pieceColor) {
+            if (boardArr[destinationX][destinationY].player.color == piece.player.color) {
                 return false;
             }
         }
@@ -249,27 +288,26 @@ public class Board {
     /**
      * Checks if the destination square is the same as source square
      *
-     * @param piece         Piece to be moved
-     * @param destinationX  X coordinate of the destination square
-     * @param destinationY  Y coordinate of the destination square
-     * @return              True if the destination square is the same as source square, false if is not
+     * @param piece        Piece to be moved
+     * @param destinationX X coordinate of the destination square
+     * @param destinationY Y coordinate of the destination square
+     * @return True if the destination square is the same as source square, false if is not
      */
-    public boolean isOriginSquare(Piece piece, int destinationX, int destinationY)
-    {
+    public boolean isOriginSquare(Piece piece, int destinationX, int destinationY) {
         return (piece.pieceX == destinationX) && (piece.pieceY == destinationY);
     }
 
     /**
      * Checks if the piece can leap over other pieces
      *
-     * @param piece         Piece to be moved
-     * @param destinationX  X coordinate of the destination square
-     * @param destinationY  Y coordinate of the destination square
-     * @return              True if can leap, false if can not
+     * @param piece        Piece to be moved
+     * @param destinationX X coordinate of the destination square
+     * @param destinationY Y coordinate of the destination square
+     * @return True if can leap, false if can not
      */
     public boolean isLeapingValid(Piece piece, int destinationX, int destinationY) {
         //Knights can always leap, kings will not ever leap
-        if (piece.getPieceType() == Type.Knight || piece.getPieceType() == Type.King) {
+        if (piece.getPieceType() == Type.KNIGHT|| piece.getPieceType() == Type.KING) {
             return true;
         }
 
@@ -280,9 +318,10 @@ public class Board {
         int y = piece.pieceY;
 
         //pawns will not leap unless it is advancing two squares
-        if (piece.getPieceType() == Type.Pawn && Math.abs(xSub) != 2) {
+        if (piece.getPieceType() == Type.PAWN && Math.abs(xSub) != 2) {
             return true;
         }
+
 
         //tests if there are any pieces in the way for all directions
         if (ySub == 0) {
@@ -292,53 +331,46 @@ public class Board {
                         return false;
                     }
                 }
-            }
-            else {
+            } else {
                 for (int i = x - 1; i > destinationX; --i) {
                     if (boardArr[i][y] != null) {
                         return false;
                     }
                 }
             }
-        }
-        else if (xSub == 0) {
+        } else if (xSub == 0) {
             if (ySub > 0) {
                 for (int i = y + 1; i < destinationY; ++i) {
                     if (boardArr[x][i] != null) {
                         return false;
                     }
                 }
-            }
-            else {
+            } else {
                 for (int i = y - 1; i > destinationY; --i) {
                     if (boardArr[x][i] != null) {
                         return false;
                     }
                 }
             }
-        }
-        else if (xSub > 0 && ySub > 0) {
+        } else if (xSub > 0 && ySub > 0) {
             for (int k = 1; k < xSub; ++k) {
                 if (boardArr[x + k][y + k] != null) {
                     return false;
                 }
             }
-        }
-        else if (xSub < 0 && ySub < 0) {
+        } else if (xSub < 0 && ySub < 0) {
             for (int k = 1; k < Math.abs(xSub); ++k) {
                 if (boardArr[x - k][y - k] != null) {
                     return false;
                 }
             }
-        }
-        else if (xSub > 0 && ySub < 0) {
+        } else if (xSub > 0 && ySub < 0) {
             for (int k = 1; k < Math.abs(xSub); ++k) {
                 if (boardArr[x + k][y - k] != null) {
                     return false;
                 }
             }
-        }
-        else if (xSub < 0 && ySub > 0) {
+        } else if (xSub < 0 && ySub > 0) {
             for (int k = 1; k < Math.abs(xSub); ++k) {
                 if (boardArr[x - k][y + k] != null) {
                     return false;
@@ -351,8 +383,8 @@ public class Board {
     /**
      * Gets the square and the piece on it with the given coordinate
      *
-     * @param coordinate    Coordinate of the square
-     * @return              Square and the piece on it
+     * @param coordinate Coordinate of the square
+     * @return Square and the piece on it
      */
     public Piece getSquare(int coordinate) {
         int row = coordinate / 8;
@@ -361,115 +393,12 @@ public class Board {
     }
 
     /**
-     * Promotes pawn into queen
+     * Checks if the move has been made successful
      *
-     * @param piece Piece to be promoted
-     */
-    public void promotePawn(Piece piece) {
-        if (pawnCanPromote(piece)) {
-            Piece queen = new Queen(piece.pieceX, piece.pieceY, piece.pieceColor);
-            boardArr[piece.pieceX][piece.pieceY] = queen;
-        }
-    }
-
-    /**
-     * Checks if the pawn can be promoted
-     *
-     * @param piece Piece to be promoted
-     * @return      True if can be promoted, false if can not
-     */
-    public boolean pawnCanPromote(Piece piece) {
-        if (piece.getPieceType() == Type.Pawn) {
-            //pawn can be promoted when it reaches the end of the board
-            if (piece.pieceX == 7 || piece.pieceX == 0) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Checks if the pawn can perform en passant move
-     *
-     * @param piece     Piece to make en passant
-     * @return          true if pawn can make en passant move, false if can not
-     */
-    public boolean pawnCanEnPassant(Piece piece) {
-        //pawn can make en passant on another pawn if it has advanced by 2 squares
-        if (piece.pieceY != 7) {
-            if (boardArr[piece.pieceX][piece.pieceY + 1] != null) {
-                if (boardArr[piece.pieceX][piece.pieceY + 1].getPieceType() == Type.Pawn &&
-                        boardArr[piece.pieceX][piece.pieceY + 1].pieceColor != piece.pieceColor) {
-                    return boardArr[piece.pieceX][piece.pieceY + 1].moved2Forward;
-                }
-            }
-        }
-        else {
-            if (boardArr[piece.pieceX][piece.pieceY - 1] != null) {
-                if (boardArr[piece.pieceX][piece.pieceY - 1].getPieceType() == Type.Pawn &&
-                        boardArr[piece.pieceX][piece.pieceY - 1].pieceColor != piece.pieceColor) {
-                    return boardArr[piece.pieceX][piece.pieceY - 1].moved2Forward;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Checks if the king can make castling move
-     *
-     * @param piece         Piece to perform castling move
+     * @param piece         Piece to be moved
      * @param destinationX  X coordinate of the destination square
      * @param destinationY  Y coordinate of the destination square
-     * @return              True if king can mak castling move, false if can not
-     */
-    public boolean kingCanCastle(Piece piece, int destinationX, int destinationY) {
-        //king can castle if king and rook have not made any moves
-        if (boardArr[destinationX][destinationY + 1] != null || boardArr[destinationX][destinationY - 2] != null) {
-            if (destinationY > piece.pieceY) {
-                if (boardArr[destinationX][destinationY + 1].getPieceType() == Type.Rook) {
-                    return (!piece.hasMoved) && (!boardArr[destinationX][destinationY + 1].hasMoved);
-                }
-            } else {
-                if (boardArr[destinationX][destinationY - 2].getPieceType() == Type.Rook) {
-                    return (!piece.hasMoved) && (!boardArr[destinationX][destinationY - 2].hasMoved);
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Makes castling move
-     *
-     * @param destinationX  X coordinate of the destination square
-     * @param destinationY  Y coordinate of the destination square
-     */
-
-    public void castleMove(int destinationX, int destinationY) {
-        //kingside castling
-        if (boardArr[destinationX][destinationY + 1] != null) {
-            if (boardArr[destinationX][destinationY + 1].getPieceType() == Type.Rook) {
-                boardArr[destinationX][destinationY - 1] = boardArr[destinationX][destinationY + 1];
-                boardArr[destinationX][destinationY + 1] = null;
-            }
-        }
-        //queenside castling
-        else if (boardArr[destinationX][destinationY - 2] != null) {
-            if (boardArr[destinationX][destinationY - 2].getPieceType() == Type.Rook) {
-                boardArr[destinationX][destinationY + 1] = boardArr[destinationX][destinationY - 2];
-                boardArr[destinationX][destinationY - 2] = null;
-            }
-        }
-    }
-
-    /**
-     * Checks if the move has been made
-     *
-     * @param piece         Piece, which made a move
-     * @param destinationX  X coordinate of the destination square
-     * @param destinationY  Y coordinate of the destination square
-     * @return              True if the move has been made, false if has not
+     * @return              True if the move has been successful, false if not
      */
     public boolean moveSuccessful(Piece piece, int destinationX, int destinationY) {
         return (piece.pieceX == destinationX) && (piece.pieceY == destinationY);

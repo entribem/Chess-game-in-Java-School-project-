@@ -1,6 +1,7 @@
 package Pieces;
 
 import Game.Color;
+import Game.Player;
 
 public abstract class Piece {
     /**
@@ -16,7 +17,7 @@ public abstract class Piece {
     /**
      * Color of the piece
      */
-    public final Color pieceColor;
+    public final Player player;
 
     /**
      Utility variable for en passant move
@@ -32,10 +33,12 @@ public abstract class Piece {
      */
     public boolean hasMoved;
 
-    public Piece(int pieceX, int pieceY, final Color pieceColor) {
+    public boolean kingCheck;
+
+    public Piece(int pieceX, int pieceY, final Player player) {
         this.pieceX = pieceX;
         this.pieceY = pieceY;
-        this.pieceColor = pieceColor;
+        this.player = player;
     }
 
     /**

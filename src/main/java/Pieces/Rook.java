@@ -1,10 +1,10 @@
 package Pieces;
 
-import Game.Color;
+import Game.Player;
 
 public class Rook extends Piece {
-    public Rook(int pieceX, int pieceY, final Color pieceColor) {
-        super(pieceX, pieceY, pieceColor);
+    public Rook(int pieceX, int pieceY, final Player player) {
+        super(pieceX, pieceY, player);
     }
 
     @Override
@@ -14,7 +14,7 @@ public class Rook extends Piece {
 
     @Override
     public Type getPieceType() {
-        return Type.Rook;
+        return Type.ROOK;
     }
 
 }

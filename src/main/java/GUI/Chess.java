@@ -1,4 +1,5 @@
 package GUI;
+import Game.Color;
 import PGN.PGNUtilities;
 
 import javax.swing.*;
@@ -12,44 +13,15 @@ public class Chess {
 
     public static void main(String[] args) {
         Chess chess = new Chess();
-        //chess.startGame();
         chess.gameLoop();
     }
 
-    /*public void startGame() {
-        String[] buttons = new String[]{"Play against human", "Play against computer"};
-        int returnValue = JOptionPane.showOptionDialog(null, "Choose a gamemode", "Chess",
-                JOptionPane.DEFAULT_OPTION, 0, null, buttons, buttons[0]);
-
-        if (returnValue == 0) {
-            againstHuman = true;
-        }
-        else if (returnValue == 1){
-            againstHuman = false;
-        }
-
-        buttons = new String[]{"Yes", "No"};
-
-        returnValue = JOptionPane.showOptionDialog(null,
-                "Do you want to place figures by yourself?", "Chess",
-                JOptionPane.DEFAULT_OPTION, 0, null, buttons, buttons[0]);
-
-        if (returnValue == 0) {
-            standardBoard = true;
-            gameLoop();
-        }
-        else if (returnValue == 1){
-            standardBoard = false;
-            gameLoop();
-        }
-    }*/
-
     public void gameLoop() {
         BoardGui gui = new BoardGui();
-        if (gui.game.player1.goesFirst) {
+        if (gui.game.player1.color == Color.WHITE) {
             gui.currentPlayer = gui.game.player1;
         }
-        else if (gui.game.player2.goesFirst) {
+        else {
             gui.currentPlayer = gui.game.player2;
         }
         gui.currentPlayer.isTurn = true;

@@ -9,7 +9,7 @@ public class BishopTests {
     @Test
     public void downLeftMove() {
         Game game = new Game();
-        Piece bishop = new Bishop(3, 3, game.player1.color);
+        Piece bishop = new Bishop(3, 3, game.player1);
         game.board.movePiece(bishop,2, 2);
         assertEquals(bishop, game.board.boardArr[2][2]);
     }
@@ -17,7 +17,7 @@ public class BishopTests {
     @Test
     public void downRightMove() {
         Game game = new Game();
-        Piece bishop = new Bishop(3, 3, game.player1.color);
+        Piece bishop = new Bishop(3, 3, game.player1);
         game.board.movePiece(bishop,4, 2);
         assertEquals(bishop, game.board.boardArr[4][2]);
     }
@@ -25,7 +25,7 @@ public class BishopTests {
     @Test
     public void upLeftMove() {
         Game game = new Game();
-        Piece bishop = new Bishop(3, 3, game.player1.color);
+        Piece bishop = new Bishop(3, 3, game.player1);
         game.board.movePiece(bishop,2, 4);
         assertEquals(bishop, game.board.boardArr[2][4]);
     }
@@ -33,7 +33,7 @@ public class BishopTests {
     @Test
     public void upRightMove() {
         Game game = new Game();
-        Piece bishop = new Bishop(3, 3, game.player1.color);
+        Piece bishop = new Bishop(3, 3, game.player1);
         game.board.movePiece(bishop,4, 4);
         assertEquals(bishop, game.board.boardArr[4][4]);
     }
@@ -41,8 +41,8 @@ public class BishopTests {
     @Test
     public void capture() {
         Game game = new Game();
-        Piece bishop = new Bishop(3, 3, game.player1.color);
-        new Pawn(4, 4, game.player2.color);
+        Piece bishop = new Bishop(3, 3, game.player1);
+        new Pawn(4, 4, game.player2);
 
         game.board.movePiece(bishop, 4, 4);
         assertEquals(bishop, game.board.boardArr[4][4]);

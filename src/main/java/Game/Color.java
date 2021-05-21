@@ -1,5 +1,5 @@
 package Game;
 
 public enum Color {
-    white, black;
+    WHITE, BLACK;
 }

@@ -1,10 +1,10 @@
 package Pieces;
 
-import Game.Color;
+import Game.Player;
 
 public class Knight extends Piece {
-    public Knight(int pieceX, int pieceY, final Color pieceColor) {
-        super(pieceX, pieceY, pieceColor);
+    public Knight(int pieceX, int pieceY, final Player player) {
+        super(pieceX, pieceY, player);
     }
 
     @Override
@@ -16,7 +16,7 @@ public class Knight extends Piece {
 
     @Override
     public Type getPieceType() {
-        return Type.Knight;
+        return Type.KNIGHT;
     }
 
 }

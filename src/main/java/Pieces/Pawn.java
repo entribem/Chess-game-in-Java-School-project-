@@ -1,11 +1,12 @@
 package Pieces;
 
-import Game.Color;
+import Game.Board;
+import Game.Player;
 
 
 public class Pawn extends Piece {
-    public Pawn(int pieceX, int pieceY, final Color pieceColor) {
-        super(pieceX, pieceY, pieceColor);
+    public Pawn(int pieceX, int pieceY, final Player player) {
+        super(pieceX, pieceY, player);
     }
 
     @Override
@@ -30,7 +31,7 @@ public class Pawn extends Piece {
 
     @Override
     public Type getPieceType() {
-        return Type.Pawn;
+        return Type.PAWN;
     }
 
     /**
@@ -45,5 +46,58 @@ public class Pawn extends Piece {
         int xSub = Math.abs(destinationX - piece.pieceX);
         int ySub = Math.abs(destinationY - piece.pieceY);
         return (xSub == 1) && (ySub == 1);
+    }
+
+    /**
+     * Promotes pawn into queen
+     *
+     * @param piece Piece to be promoted
+     */
+    public static void promotePawn(Piece piece) {
+        if (pawnCanPromote(piece)) {
+            Piece queen = new Queen(piece.pieceX, piece.pieceY, piece.player);
+            piece.player.game.board.boardArr[piece.pieceX][piece.pieceY] = queen;
+        }
+    }
+
+    /**
+     * Checks if the pawn can be promoted
+     *
+     * @param piece Piece to be promoted
+     * @return True if can be promoted, false if can not
+     */
+    public static boolean pawnCanPromote(Piece piece) {
+        if (piece.getPieceType() == Type.PAWN) {
+            //pawn can be promoted when it reaches the end of the board
+            if (piece.pieceX == 7 || piece.pieceX == 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
+     * Checks if the pawn can perform en passant move
+     *
+     * @param piece Piece to make en passant
+     * @return true if pawn can make en passant move, false if can not
+     */
+    public static boolean pawnCanEnPassant(Piece piece) {
+        Board board = piece.player.game.board;
+        //pawn can make en passant on another pawn if it has advanced by 2 squares
+        if (piece.pieceY != 7 && piece.pieceY != 0) {
+            if (board.boardArr[piece.pieceX][piece.pieceY + 1] != null) {
+                if (board.boardArr[piece.pieceX][piece.pieceY + 1].getPieceType() == Type.PAWN &&
+                        board.boardArr[piece.pieceX][piece.pieceY + 1].player.color != piece.player.color) {
+                    return board.boardArr[piece.pieceX][piece.pieceY + 1].moved2Forward;
+                }
+            }
+            else if (board.boardArr[piece.pieceX][piece.pieceY - 1] != null) {
+                if (board.boardArr[piece.pieceX][piece.pieceY - 1].getPieceType() == Type.PAWN &&
+                        board.boardArr[piece.pieceX][piece.pieceY - 1].player.color != piece.player.color) {
+                    return board.boardArr[piece.pieceX][piece.pieceY - 1].moved2Forward;
+                }
+            }
+        }
+        return false;
     }
 }
