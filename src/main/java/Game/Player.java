@@ -24,12 +24,10 @@ public class Player {
     /**
      * If the second player is a computer
      */
-    public boolean isComputer = false;
 
     public Player(Color color) {
         this.color = color;
     }
-
 
     /**
      * Gets all enemy pieces

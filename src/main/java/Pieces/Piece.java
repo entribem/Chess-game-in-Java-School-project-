@@ -24,7 +24,7 @@ public abstract class Piece {
      * which indicates
      * if the pawn has advanced by two squares
      */
-    public boolean moved2Forward;
+    protected boolean moved2Forward;
 
     /**
      * Utility variable for castling move
@@ -32,8 +32,6 @@ public abstract class Piece {
      * if the rook or king has made any move
      */
     public boolean hasMoved;
-
-    public boolean kingCheck;
 
     public Piece(int pieceX, int pieceY, final Player player) {
         this.pieceX = pieceX;

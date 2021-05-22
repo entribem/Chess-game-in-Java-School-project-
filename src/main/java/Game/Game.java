@@ -1,6 +1,8 @@
 package Game;
 
-public class Game {
+import java.util.Optional;
+
+public final class Game {
     /**
      * First player
      */
@@ -10,6 +12,9 @@ public class Game {
      * Second player
      */
     public Player player2;
+
+    private static final Game INSTANCE = new Game();
+
     public Board board;
 
     /**
@@ -17,36 +22,29 @@ public class Game {
      */
     public int turn;
 
-    /**
-     * Standard height of the board, which is 8
-     */
-    final static int standardHeight = 8;
+    private Game() {
+    }
 
-    /**
-     * Standard width of the board, which is 8
-     */
-    final static int standardWidth = 8;
-
-    public Game() {
-        loadGame();
+    public static Game getInstance() {
+        return Game.INSTANCE;
     }
 
     /**
      * Creates board, loads players and pieces
      */
     public void loadGame() {
-        board = new Board(this, standardHeight, standardWidth);
+        board = Board.getInstance();
         loadPlayers();
         board.loadStandardPieces();
         turn = 0;
-        player1.game = this;
-        player2.game = this;
+        player1.game = Game.getInstance();
+        player2.game = Game.getInstance();
     }
 
     /**
      * Creates two players and randomly assigns colors
      */
-    public void loadPlayers() {
+    private void loadPlayers() {
         player1 = new Player(Color.WHITE);
         player2 = new Player(Color.BLACK);
     }

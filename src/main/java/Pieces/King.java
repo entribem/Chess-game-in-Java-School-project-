@@ -81,7 +81,7 @@ public class King extends Piece {
      * @param y             Y coordinate of the king
      * @return              True if can capture, false if can not
      */
-    public static boolean canCaptureKing(Piece enemyPiece, int x, int y)
+    private static boolean canCaptureKing(Piece enemyPiece, int x, int y)
     {
         Board board = enemyPiece.player.game.board;
         return enemyPiece.isValidPath(x, y) && board.isMoveValid(enemyPiece, x, y);
@@ -117,7 +117,7 @@ public class King extends Piece {
      * @param destinationY  Y coordinate of the destination square
      * @return              True if the king can move there, false if can not
      */
-    public static boolean kingCanMove(Piece piece, int destinationX, int destinationY) {
+    private static boolean kingCanMove(Piece piece, int destinationX, int destinationY) {
         if (destinationX != 8 && destinationY != 8 && destinationX != -1 && destinationY != -1) {
             if (piece.isValidPath(destinationX, destinationY)
                     && !kingInCheck(piece, destinationX, destinationY)

@@ -2,11 +2,12 @@ package Game;
 
 import Pieces.*;
 
+import java.util.Optional;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Board {
+public final class Board {
     /**
      * If the king is in check
      */
@@ -15,41 +16,43 @@ public class Board {
     /**
      * Height of the board
      */
-    public final int height;
+    public final static int HEIGHT = 8;
 
     /**
      * Width of the board
      */
-    public final int width;
+    public final static int WIDTH = 8;
 
     /**
      * Array which represents the board
      */
-    public Piece[][] boardArr;
+    public Piece[][] boardArr = new Piece[HEIGHT][WIDTH];
+
+    private static final Board INSTANCE = new Board();
 
     private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
 
     /**
      * Vector containing all white pieces
      */
-    public Vector<Piece> whitePieces = new Vector<Piece>(16);
+    public Vector<Piece> whitePieces = new Vector<>(16);
     /**
      * Vector containing all black pieces
      */
-    public Vector<Piece> blackPieces = new Vector<Piece>(16);
+    public Vector<Piece> blackPieces = new Vector<>(16);
 
-    public Board(Game game, int height, int width) {
-        this.game = game;
-        this.height = height;
-        this.width = width;
-        boardArr = new Piece[height][width];
+    private Board() {
+    }
 
+    public static Board getInstance() {
+        return Board.INSTANCE;
     }
 
     /**
      * Creates pieces and populates board with them for each player
      */
-    public void loadStandardPieces() {
+    protected void loadStandardPieces() {
+        game = Game.getInstance();
         loadPiecesPlayer1();
         loadPiecesPlayer2();
         setPieceVectors();
@@ -58,8 +61,8 @@ public class Board {
     /**
      * Creates pieces and populates board for the second player
      */
-    public void loadPiecesPlayer2() {
-        for (int i = 0; i < width; ++i) {
+    private void loadPiecesPlayer2() {
+        for (int i = 0; i < WIDTH; ++i) {
             Piece pawn = new Pawn(1, i, game.player2);
             boardArr[1][i] = pawn;
         }
@@ -89,8 +92,8 @@ public class Board {
     /**
      * Creates pieces and populates board for the first player
      */
-    public void loadPiecesPlayer1() {
-        for (int i = 0; i < width; ++i) {
+    private void loadPiecesPlayer1() {
+        for (int i = 0; i < WIDTH; ++i) {
             Piece pawn = new Pawn(6, i, game.player1);
             boardArr[6][i] = pawn;
         }
@@ -120,7 +123,7 @@ public class Board {
     /**
      * Add pieces to the vectors
      */
-    public void setPieceVectors() {
+    private void setPieceVectors() {
         for (int i = 0; i < 8; i++) {
             if (game.player1.color == Color.WHITE) {
                 whitePieces.add(this.boardArr[6][i]);
@@ -175,8 +178,8 @@ public class Board {
      * @param destinationX X coordinate of the destination square
      * @param destinationY Y coordinate of the destination square
      */
-    public void setPieceLocation(Piece piece, int destinationX, int destinationY) {
-        if (boardArr[destinationX][destinationY] != null) {
+    private void setPieceLocation(Piece piece, int destinationX, int destinationY) {
+        if (Optional.ofNullable(boardArr[destinationX][destinationY]).isPresent()) {
             if (boardArr[destinationX][destinationY].player.color == Color.WHITE) {
                 whitePieces.remove(boardArr[destinationX][destinationY]);
             } else {
@@ -229,14 +232,15 @@ public class Board {
 
         if (piece.getPieceType() == Type.PAWN) {
             if (!Pawn.pawnCanCapture(piece, destinationX, destinationY) &&
-                    boardArr[destinationX][destinationY] != null) {
+                    Optional.ofNullable(boardArr[destinationX][destinationY]).isPresent()) {
                 return false;
             }
         }
 
         //pawn can not move sideways if it can not capture or en passant
         if (piece.getPieceType() == Type.PAWN && Pawn.pawnCanCapture(piece, destinationX, destinationY)
-                && boardArr[destinationX][destinationY] == null && !Pawn.pawnCanEnPassant(piece)) {
+                && Optional.ofNullable(boardArr[destinationX][destinationY]).isEmpty()
+                && !Pawn.pawnCanEnPassant(piece)) {
             return false;
         }
 
@@ -250,8 +254,8 @@ public class Board {
      * @param destinationX X coordinate of the destination square
      * @param destinationY Y coordinate of the destination square
      */
-    public void isGoingToCaptureKing(int destinationX, int destinationY) {
-        if (boardArr[destinationX][destinationY] != null) {
+    private void isGoingToCaptureKing(int destinationX, int destinationY) {
+        if (Optional.ofNullable(boardArr[destinationX][destinationY]).isPresent()) {
             if (boardArr[destinationX][destinationY].getPieceType() == Type.KING) {
                 if (boardArr[destinationX][destinationY].player.color == game.player1.color) {
                     game.player1.hasLost = true;
@@ -272,8 +276,8 @@ public class Board {
      * @param destinationY Y coordinate of the destination square
      * @return False if occupied by the piece of the same color, true if not
      */
-    public boolean isDestinationValid(Piece piece, int destinationX, int destinationY) {
-        if (boardArr[destinationX][destinationY] == null) {
+    private boolean isDestinationValid(Piece piece, int destinationX, int destinationY) {
+        if (Optional.ofNullable(boardArr[destinationX][destinationY]).isEmpty()) {
             return true;
         } else {
             //piece can not capture pieces of the same color
@@ -304,7 +308,7 @@ public class Board {
      * @param destinationY Y coordinate of the destination square
      * @return True if can leap, false if can not
      */
-    public boolean isLeapingValid(Piece piece, int destinationX, int destinationY) {
+    private boolean isLeapingValid(Piece piece, int destinationX, int destinationY) {
         //Knights can always leap, kings will not ever leap
         if (piece.getPieceType() == Type.KNIGHT|| piece.getPieceType() == Type.KING) {
             return true;
@@ -326,13 +330,13 @@ public class Board {
         if (ySub == 0) {
             if (xSub > 0) {
                 for (int i = x + 1; i < destinationX; ++i) {
-                    if (boardArr[i][y] != null) {
+                    if (Optional.ofNullable(boardArr[i][y]).isPresent()) {
                         return false;
                     }
                 }
             } else {
                 for (int i = x - 1; i > destinationX; --i) {
-                    if (boardArr[i][y] != null) {
+                    if (Optional.ofNullable(boardArr[i][y]).isPresent()) {
                         return false;
                     }
                 }
@@ -340,38 +344,38 @@ public class Board {
         } else if (xSub == 0) {
             if (ySub > 0) {
                 for (int i = y + 1; i < destinationY; ++i) {
-                    if (boardArr[x][i] != null) {
+                    if (Optional.ofNullable(boardArr[x][i]).isPresent()) {
                         return false;
                     }
                 }
             } else {
                 for (int i = y - 1; i > destinationY; --i) {
-                    if (boardArr[x][i] != null) {
+                    if (Optional.ofNullable(boardArr[x][i]).isPresent()) {
                         return false;
                     }
                 }
             }
         } else if (xSub > 0 && ySub > 0) {
             for (int k = 1; k < xSub; ++k) {
-                if (boardArr[x + k][y + k] != null) {
+                if (Optional.ofNullable(boardArr[x + k][y + k]).isPresent()) {
                     return false;
                 }
             }
         } else if (xSub < 0 && ySub < 0) {
             for (int k = 1; k < Math.abs(xSub); ++k) {
-                if (boardArr[x - k][y - k] != null) {
+                if (Optional.ofNullable(boardArr[x - k][y - k]).isPresent()) {
                     return false;
                 }
             }
         } else if (xSub > 0 && ySub < 0) {
             for (int k = 1; k < Math.abs(xSub); ++k) {
-                if (boardArr[x + k][y - k] != null) {
+                if (Optional.ofNullable(boardArr[x + k][y - k]).isPresent()) {
                     return false;
                 }
             }
         } else if (xSub < 0 && ySub > 0) {
             for (int k = 1; k < Math.abs(xSub); ++k) {
-                if (boardArr[x - k][y + k] != null) {
+                if (Optional.ofNullable(boardArr[x - k][y + k]).isPresent()) {
                     return false;
                 }
             }

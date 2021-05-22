@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,12 +22,12 @@ import static PGN.PGNUtilities.saveMove;
 import static javax.swing.SwingUtilities.*;
 
 public class BoardGui {
-    Game game;
+    protected final Game game;
     Player currentPlayer;
     /**
      * If the turn has ended
      */
-    public boolean endTurn = false;
+    protected boolean endTurn = false;
     private final JFrame gameFrame;
     private final Board chessBoard;
     //path to the piece icons
@@ -39,16 +40,16 @@ public class BoardGui {
     /**
      * Piece, which player wants to move
      */
-    public Piece sourceSquare;
+    private Piece sourceSquare;
     /**
      * Square, where players wants to move his piece
      */
-    public Piece destinationSquare;
+    private Piece destinationSquare;
 
     /**
      * Waits for the end of other players turn
      */
-    public synchronized void waitForInput() {
+    protected synchronized void waitForInput() {
         while (!endTurn) {
             try {
                 wait();
@@ -61,14 +62,15 @@ public class BoardGui {
     /**
      * Notifies that the player has ended their turn
      */
-    public synchronized void notifyInput() {
+    private synchronized void notifyInput() {
         endTurn = true;
         notifyAll();
     }
 
-    public BoardGui() {
-        this.game = new Game();
-        this.chessBoard = game.board;
+    protected BoardGui() {
+        this.game = Game.getInstance();
+        this.chessBoard = Board.getInstance();
+        game.loadGame();
         gameFrame = new JFrame("Chess");
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameFrame.setSize(600, 600);
@@ -101,18 +103,18 @@ public class BoardGui {
     }
 
 
-    public class BoardPanel extends JPanel {
+    private class BoardPanel extends JPanel {
         final List<SquarePanel> boardSquares;
 
         /**
          * Represents board
          */
-        public BoardPanel() {
+        private BoardPanel() {
             //draws board
-            setLayout(new GridLayout(chessBoard.height, chessBoard.width));
+            setLayout(new GridLayout(Board.HEIGHT, Board.WIDTH));
             boardSquares = new ArrayList<>();
             //fill the board with squares
-            for (int i = 0; i < chessBoard.height * chessBoard.width; ++i) {
+            for (int i = 0; i < Board.HEIGHT * Board.WIDTH; ++i) {
                 final SquarePanel squarePanel = new SquarePanel(i, this);
                 boardSquares.add(squarePanel);
                 add(squarePanel);
@@ -126,7 +128,7 @@ public class BoardGui {
          *
          * @param board Board to be redrawn
          */
-        public void redrawBoard(Board board) {
+        private void redrawBoard(Board board) {
             removeAll();
             for (SquarePanel squarePanel : boardSquares) {
                 squarePanel.drawSquare(board);
@@ -140,13 +142,13 @@ public class BoardGui {
     /**
      * Represents squares on the board
      */
-    public class SquarePanel extends JPanel {
+    private class SquarePanel extends JPanel {
         /**
          * Coordinate which represents the square (0-63)
          */
-        public final int squareNum;
+        private final int squareNum;
 
-        public SquarePanel(final int squareNum, final BoardPanel boardPanel) {
+        private SquarePanel(final int squareNum, final BoardPanel boardPanel) {
             setLayout(new GridBagLayout());
 
             this.squareNum = squareNum;
@@ -157,60 +159,58 @@ public class BoardGui {
             addMouseListener(new MouseListener() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
-                    if (!currentPlayer.isComputer) {
-                        if (isLeftMouseButton(e)) {
-                            if (sourceSquare == null) {
-                                //chooses the piece which player wants to move
-                                sourceSquare = chessBoard.getSquare(squareNum);
-                                //checks if the player tries to move from empty square
-                                if (sourceSquare == null) {
-                                    LOGGER.log(Level.WARNING, "Empty square, choose another");
-                                } else {
-                                    //checks if the player tries to move other players pieces
-                                    if (sourceSquare.player.color != currentPlayer.color) {
-                                        sourceSquare = null;
-                                        LOGGER.log(Level.WARNING, "Invalid move, can not move other players pieces");
-                                    }
-                                    LOGGER.log(Level.INFO, "Source square = " + sourceSquare);
-                                }
+                    if (isLeftMouseButton(e)) {
+                        if (Optional.ofNullable(sourceSquare).isEmpty()) {
+                            //chooses the piece which player wants to move
+                            sourceSquare = chessBoard.getSquare(squareNum);
+                            //checks if the player tries to move from empty square
+                            if (Optional.ofNullable(sourceSquare).isEmpty()) {
+                                LOGGER.log(Level.WARNING, "Empty square, choose another");
                             } else {
-                                //chooses where player wants to move their piece
-                                destinationSquare = chessBoard.getSquare(squareNum);
-                                LOGGER.log(Level.INFO, "Destination square = " + destinationSquare);
-                                int row = squareNum / 8;
-                                int col = squareNum - (row * 8);
-                                int pieceY = sourceSquare.pieceY;
-                                //if the destination square is not the same as a source square
-                                if (!chessBoard.isOriginSquare(sourceSquare, row, col)) {
-                                    //tries to move the piece
-                                    chessBoard.movePiece(sourceSquare, row, col);
-                                    //if the move has been made, notifies the other player and saves the move
-                                    if (chessBoard.moveSuccessful(sourceSquare, row, col) ||
+                                //checks if the player tries to move other players pieces
+                                if (sourceSquare.player.color != currentPlayer.color) {
+                                    sourceSquare = null;
+                                    LOGGER.log(Level.WARNING, "Invalid move, can not move other players pieces");
+                                }
+                                LOGGER.log(Level.INFO, "Source square = " + sourceSquare);
+                            }
+                        } else {
+                            //chooses where player wants to move their piece
+                            destinationSquare = chessBoard.getSquare(squareNum);
+                            LOGGER.log(Level.INFO, "Destination square = " + destinationSquare);
+                            int row = squareNum / 8;
+                            int col = squareNum - (row * 8);
+                            int pieceY = sourceSquare.pieceY;
+                            //if the destination square is not the same as a source square
+                            if (!chessBoard.isOriginSquare(sourceSquare, row, col)) {
+                                //tries to move the piece
+                                chessBoard.movePiece(sourceSquare, row, col);
+                                //if the move has been made, notifies the other player and saves the move
+                                if (chessBoard.moveSuccessful(sourceSquare, row, col) ||
                                         chessBoard.game.player1.hasLost ||
                                         chessBoard.game.player2.hasLost) {
-                                        endTurn = true;
-                                        notifyInput();
-                                        saveMove(destinationSquare, sourceSquare, pieceY, chessBoard);
-                                    }
+                                    endTurn = true;
+                                    notifyInput();
+                                    saveMove(destinationSquare, sourceSquare, pieceY, chessBoard);
                                 }
-
-                                //tries to promote the pawn if possible
-                                if (sourceSquare.getPieceType() == Type.PAWN) {
-                                    Pawn.promotePawn(sourceSquare);
-                                }
-                                sourceSquare = null;
-                                destinationSquare = null;
                             }
-                        }
-                        //cancel the choice of the piece by pressing right mouse button
-                        else if (isRightMouseButton(e)) {
+
+                            //tries to promote the pawn if possible
+                            if (sourceSquare.getPieceType() == Type.PAWN) {
+                                Pawn.promotePawn(sourceSquare);
+                            }
                             sourceSquare = null;
                             destinationSquare = null;
                         }
-                        //updates the board with the new move
-                        boardPanel.redrawBoard(chessBoard);
                     }
 
+                    //cancel the choice of the piece by pressing right mouse button
+                    else if (isRightMouseButton(e)) {
+                        sourceSquare = null;
+                        destinationSquare = null;
+                    }
+                    //updates the board with the new move
+                    boardPanel.redrawBoard(chessBoard);
                 }
 
                 @Override
@@ -241,11 +241,13 @@ public class BoardGui {
          *
          * @param board Board
          */
-        public void placeFigure(Board board) {
+        private void placeFigure(Board board) {
             try {
                 Piece piece;
-                if ((piece = board.getSquare(this.squareNum)) != null) {
+               // if ((piece = board.getSquare(this.squareNum)) != Optional.ofNullable(sourceSquare).isEmpty()) {
+                if (Optional.ofNullable(board.getSquare(this.squareNum)).isPresent()) {
                     //read and set icons of the pieces
+                    piece = board.getSquare(this.squareNum);
                     String imgPath = pieceIconPath + piece.player.color + "_"
                             + piece.getPieceType() + ".png";
                     BufferedImage icon = ImageIO.read(new File(imgPath));
@@ -253,15 +255,16 @@ public class BoardGui {
                 }
             } catch(IOException e){
                     e.printStackTrace();
+                    LOGGER.log(Level.WARNING, "Could not load the image");
             }
         }
 
         /**
          * Paints the square light or dark
          */
-        public void paintSquare() {
+        private void paintSquare() {
             this.removeAll();
-            if ((this.squareNum / 8) % 2 == 0) {
+            if ((this.squareNum / Board.WIDTH) % 2 == 0) {
                 if ((this.squareNum % 2) == 0) {
                     setBackground(Color.lightGray);
                 } else {
@@ -281,7 +284,7 @@ public class BoardGui {
          *
          * @param board Board
          */
-        public void drawSquare(final Board board) {
+        private void drawSquare(final Board board) {
             paintSquare();
             placeFigure(board);
             repaint();

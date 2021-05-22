@@ -9,15 +9,14 @@ import java.util.logging.Logger;
 
 public class Chess {
     private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
-
-
+    private BoardGui gui;
     public static void main(String[] args) {
         Chess chess = new Chess();
         chess.gameLoop();
     }
 
-    public void gameLoop() {
-        BoardGui gui = new BoardGui();
+    private void gameLoop() {
+        gui = new BoardGui();
         if (gui.game.player1.color == Color.WHITE) {
             gui.currentPlayer = gui.game.player1;
         }
@@ -55,13 +54,13 @@ public class Chess {
         }
         //saves match to pgn file
         else {
-            LOGGER.log(Level.INFO, "Saving game to PGN file");
             try {
                 PGNUtilities.writeGameToPGNFile();
+                LOGGER.log(Level.INFO, "Successfully saved the  game to PGN file");
             } catch (IOException e) {
+                LOGGER.log(Level.WARNING, "Could not save the game to PGN file");
                 e.printStackTrace();
             }
         }
     }
-
 }

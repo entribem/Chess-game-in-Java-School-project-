@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 public class PawnTests {
     @Test
     public void forwardMove() {
-        Game game = new Game();
+        Game game = Game.getInstance();
         Piece pawn = new Pawn(3, 3, game.player1);
         game.board.movePiece(pawn,4, 3);
         assertEquals(pawn, game.board.boardArr[4][3]);
@@ -15,7 +15,7 @@ public class PawnTests {
 
     @Test
     public void forward2Move() {
-        Game game = new Game();
+        Game game = Game.getInstance();
         Piece pawn = new Pawn(1, 1, game.player1);
         game.board.movePiece(pawn,3, 1);
         assertEquals(pawn, game.board.boardArr[3][1]);
@@ -23,7 +23,7 @@ public class PawnTests {
 
     @Test
     public void capture() {
-        Game game = new Game();
+        Game game = Game.getInstance();
         Piece pawn = new Pawn(3, 3, game.player1);
         new Pawn(4, 4, game.player2);
 
