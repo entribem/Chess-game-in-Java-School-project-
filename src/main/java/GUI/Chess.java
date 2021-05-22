@@ -43,7 +43,7 @@ public class Chess {
             gui.endTurn = false;
         }
         String[] buttons = new String[]{"Yes", "No", "Save game"};
-        int returnValue = JOptionPane.showOptionDialog(null, "CHECKMATE. Play a new game?",
+        int returnValue = JOptionPane.showOptionDialog(null, "Game over. Play a new game?",
                 "GAME OVER",
                 JOptionPane.DEFAULT_OPTION, 0, null, buttons, buttons[0]);
         if (returnValue == 1) {

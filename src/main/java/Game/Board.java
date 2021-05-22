@@ -209,7 +209,6 @@ public class Board {
 
         if (piece.getPieceType() != Type.KING) {
             Piece king = King.findKing(piece.player);
-
             if (King.kingInCheck(piece, king.pieceX, king.pieceY) &&
                     !King.allyCanDefendKing(piece, king, destinationX, destinationY)) {
                 LOGGER.log(Level.WARNING, "King is in check");

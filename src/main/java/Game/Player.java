@@ -30,6 +30,7 @@ public class Player {
         this.color = color;
     }
 
+
     /**
      * Gets all enemy pieces
      *

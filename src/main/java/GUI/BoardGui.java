@@ -1,5 +1,6 @@
 package GUI;
 
+import PGN.PGNUtilities;
 import Pieces.*;
 import Game.*;
 import javax.imageio.ImageIO;
@@ -7,8 +8,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.Color;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -70,10 +73,33 @@ public class BoardGui {
         gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gameFrame.setSize(600, 600);
         gameFrame.setLayout(new BorderLayout());
+        final JMenuBar menuBar = new JMenuBar();
+        fillMenu(menuBar);
+        this.gameFrame.setJMenuBar(menuBar);
         BoardPanel panel = new BoardPanel();
         gameFrame.add(panel, BorderLayout.CENTER);
         gameFrame.setVisible(true);
     }
+
+    private void fillMenu(final JMenuBar menuBar) {
+        menuBar.add(createMenu());
+    }
+
+    private JMenu createMenu() {
+        final JMenu fileMenu = new JMenu("Game");
+        final JMenuItem resign = new JMenuItem("Resign");
+        resign.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                currentPlayer.hasLost = true;
+                System.out.println(currentPlayer + " has lost!");
+                notifyInput();
+            }
+        });
+        fileMenu.add(resign);
+        return fileMenu;
+    }
+
 
     public class BoardPanel extends JPanel {
         final List<SquarePanel> boardSquares;
@@ -220,12 +246,13 @@ public class BoardGui {
                 Piece piece;
                 if ((piece = board.getSquare(this.squareNum)) != null) {
                     //read and set icons of the pieces
-                    Image icon = ImageIO.read(new File(pieceIconPath + piece.player.color + "_"
-                            + piece.getPieceType() + ".png"));
+                    String imgPath = pieceIconPath + piece.player.color + "_"
+                            + piece.getPieceType() + ".png";
+                    BufferedImage icon = ImageIO.read(new File(imgPath));
                     add(new JLabel(new ImageIcon(icon)));
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch(IOException e){
+                    e.printStackTrace();
             }
         }
 

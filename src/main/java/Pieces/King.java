@@ -51,28 +51,6 @@ public class King extends Piece {
     }
 
     /**
-     * Checks if the king can not get out of check
-     *
-     * @param piece King piece
-     * @return      True if checkmate, false if not
-     */
-    public static boolean isCheckmate(Piece piece) {
-        if (!kingCanMove(piece, piece.pieceX, piece.pieceY)
-                && !kingCanMove(piece, piece.pieceX + 1, piece.pieceY)
-                && !kingCanMove(piece, piece.pieceX + 1, piece.pieceY + 1)
-                && !kingCanMove(piece, piece.pieceX + 1, piece.pieceY - 1)
-                && !kingCanMove(piece, piece.pieceX - 1, piece.pieceY)
-                && !kingCanMove(piece, piece.pieceX - 1, piece.pieceY+ 1)
-                && !kingCanMove(piece, piece.pieceX - 1, piece.pieceY - 1)
-                && !kingCanMove(piece, piece.pieceX + 1, piece.pieceY + 1)) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-
-    /**
      * Checks if the king is in check
      *
      * @param piece         Piece
@@ -85,8 +63,7 @@ public class King extends Piece {
 
         for(int i = 0; i < enemyPieces.size(); i++)
         {
-            if (canCaptureKing(enemyPieces.elementAt(i), destinationX, destinationY))
-            {
+            if (canCaptureKing(enemyPieces.elementAt(i), destinationX, destinationY)) {
                 LOGGER.log(Level.WARNING, "Cant move there, king will be under check!");
                 piece.player.game.board.kingCheck = true;
                 return true;
@@ -108,6 +85,28 @@ public class King extends Piece {
     {
         Board board = enemyPiece.player.game.board;
         return enemyPiece.isValidPath(x, y) && board.isMoveValid(enemyPiece, x, y);
+    }
+
+    /**
+     * Checks if the king can not get out of check
+     *
+     * @param piece King piece
+     * @return      True if checkmate, false if not
+     */
+    public static boolean isCheckmate(Piece piece) {
+        if (!kingCanMove(piece, piece.pieceX, piece.pieceY)
+                && !kingCanMove(piece, piece.pieceX + 1, piece.pieceY)
+                && !kingCanMove(piece, piece.pieceX + 1, piece.pieceY + 1)
+                && !kingCanMove(piece, piece.pieceX + 1, piece.pieceY - 1)
+                && !kingCanMove(piece, piece.pieceX - 1, piece.pieceY)
+                && !kingCanMove(piece, piece.pieceX - 1, piece.pieceY+ 1)
+                && !kingCanMove(piece, piece.pieceX - 1, piece.pieceY - 1)
+                && !kingCanMove(piece, piece.pieceX + 1, piece.pieceY + 1)) {
+            return true;
+        }
+        else {
+            return false;
+        }
     }
 
     /**
@@ -150,7 +149,7 @@ public class King extends Piece {
                 }
             }
         }
-        return player.game.board.blackPieces.elementAt(0);
+        return player.game.board.whitePieces.elementAt(0);
     }
 
     /**
