@@ -12,7 +12,7 @@ public final class Board {
      * If the king is in check
      */
     public boolean kingCheck;
-    public Game game;
+    private Game game;
     /**
      * Height of the board
      */
@@ -164,7 +164,6 @@ public final class Board {
             if (piece.getPieceType() == Type.KING || piece.getPieceType() == Type.ROOK) {
                 piece.hasMoved = true;
             }
-
             setPieceLocation(piece, destinationX, destinationY);
         } else {
             LOGGER.log(Level.WARNING, "Invalid move");
@@ -212,22 +211,23 @@ public final class Board {
 
         if (piece.getPieceType() != Type.KING) {
             Piece king = King.findKing(piece.player);
-            if (King.kingInCheck(piece, king.pieceX, king.pieceY) &&
-                    !King.allyCanDefendKing(piece, king, destinationX, destinationY)) {
+            if (King.kingInCheck(piece, king.pieceX, king.pieceY)) {
                 LOGGER.log(Level.WARNING, "King is in check");
                 kingCheck = true;
-                if (King.isCheckmate(king)) {
-                    if (king.player.color == Color.WHITE) {
-                        game.player1.hasLost = true;
-                        LOGGER.log(Level.INFO, "PLAYER 1 HAS LOST");
+                if (!King.allyCanDefendKing(piece, king, destinationX, destinationY)) {
+                    if (King.isCheckmate(king)) {
+                        if (king.player.color == Color.WHITE) {
+                            game.player1.hasLost = true;
+                            LOGGER.log(Level.INFO, "PLAYER 1 HAS LOST");
+                        } else {
+                            game.player2.hasLost = true;
+                            LOGGER.log(Level.INFO, "PLAYER 2 HAS LOST");
+                        }
                     }
-                    else {
-                        game.player2.hasLost = true;
-                        LOGGER.log(Level.INFO, "PLAYER 2 HAS LOST");
-                    }
+                    return false;
                 }
-                return false;
             }
+
         }
 
         if (piece.getPieceType() == Type.PAWN) {

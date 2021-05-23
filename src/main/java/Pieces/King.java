@@ -4,12 +4,14 @@ import Game.Board;
 import Game.Color;
 import Game.Player;
 
+import java.util.Optional;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class King extends Piece {
     private final static Logger LOGGER = Logger.getLogger(Logger.GLOBAL_LOGGER_NAME);
+    private final static Board board = Board.getInstance();
     public King(int pieceX, int pieceY, final Player player) {
         super(pieceX, pieceY, player);
     }
@@ -39,13 +41,16 @@ public class King extends Piece {
      * @return              True if can defend, false if can not
      */
     public static boolean allyCanDefendKing(Piece piece, Piece king, int destinationX, int destinationY) {
-        piece.player.game.board.boardArr[destinationX][destinationY] = piece;
+        if (Optional.ofNullable(board.boardArr[destinationX][destinationY]).isPresent()) {
+            return true;
+        }
+        board.boardArr[destinationX][destinationY] = piece;
         if (kingInCheck(king, king.pieceX, king.pieceY)) {
-            piece.player.game.board.boardArr[destinationX][destinationY] = null;
+            board.boardArr[destinationX][destinationY] = null;
             return false;
         }
         else {
-            piece.player.game.board.boardArr[destinationX][destinationY] = null;
+            board.boardArr[destinationX][destinationY] = null;
             return true;
         }
     }
@@ -65,11 +70,11 @@ public class King extends Piece {
         {
             if (canCaptureKing(enemyPieces.elementAt(i), destinationX, destinationY)) {
                 LOGGER.log(Level.WARNING, "Cant move there, king will be under check!");
-                piece.player.game.board.kingCheck = true;
+                board.kingCheck = true;
                 return true;
             }
         }
-        piece.player.game.board.kingCheck = false;
+        board.kingCheck = false;
         return false;
     }
 
@@ -83,7 +88,6 @@ public class King extends Piece {
      */
     private static boolean canCaptureKing(Piece enemyPiece, int x, int y)
     {
-        Board board = enemyPiece.player.game.board;
         return enemyPiece.isValidPath(x, y) && board.isMoveValid(enemyPiece, x, y);
     }
 
@@ -121,7 +125,7 @@ public class King extends Piece {
         if (destinationX != 8 && destinationY != 8 && destinationX != -1 && destinationY != -1) {
             if (piece.isValidPath(destinationX, destinationY)
                     && !kingInCheck(piece, destinationX, destinationY)
-                    && piece.player.game.board.isMoveValid(piece, destinationX, destinationY)) {
+                    && board.isMoveValid(piece, destinationX, destinationY)) {
                 return true;
             }
         }
@@ -136,20 +140,20 @@ public class King extends Piece {
      */
     public static Piece findKing(Player player) {
         if (player.color == Color.WHITE) {
-            for (int i = 0; i < player.game.board.whitePieces.size(); i++) {
-                if (player.game.board.whitePieces.elementAt(i).getPieceType() == Type.KING) {
-                    return player.game.board.whitePieces.elementAt(i);
+            for (int i = 0; i < board.whitePieces.size(); i++) {
+                if (board.whitePieces.elementAt(i).getPieceType() == Type.KING) {
+                    return board.whitePieces.elementAt(i);
                 }
             }
         }
         else {
-            for (int i = 0; i < player.game.board.blackPieces.size(); i++) {
-                if (player.game.board.blackPieces.elementAt(i).getPieceType() == Type.KING) {
-                    return player.game.board.blackPieces.elementAt(i);
+            for (int i = 0; i < board.blackPieces.size(); i++) {
+                if (board.blackPieces.elementAt(i).getPieceType() == Type.KING) {
+                    return board.blackPieces.elementAt(i);
                 }
             }
         }
-        return player.game.board.whitePieces.elementAt(0);
+        return board.whitePieces.elementAt(0);
     }
 
     /**
@@ -163,7 +167,6 @@ public class King extends Piece {
     public static boolean kingCanCastle(Piece piece, int destinationX, int destinationY) {
         //king can castle if king and rook have not made any moves
         if (!piece.hasMoved) {
-            Board board = piece.player.game.board;
             if (board.boardArr[destinationX][destinationY + 1] != null) {
                 if (destinationY > piece.pieceY) {
                     if (board.boardArr[destinationX][destinationY + 1].getPieceType() == Type.ROOK) {
@@ -186,7 +189,6 @@ public class King extends Piece {
      * @param destinationY  Y coordinate of the destination square
      */
     public static void castleMove(Piece piece, int destinationX, int destinationY) {
-        Board board = piece.player.game.board;
         //kingside castling
         if (board.boardArr[destinationX][destinationY + 1] != null) {
             if (board.boardArr[destinationX][destinationY + 1].getPieceType() == Type.ROOK) {

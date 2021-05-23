@@ -187,11 +187,11 @@ public class BoardGui {
                                 chessBoard.movePiece(sourceSquare, row, col);
                                 //if the move has been made, notifies the other player and saves the move
                                 if (chessBoard.moveSuccessful(sourceSquare, row, col) ||
-                                        chessBoard.game.player1.hasLost ||
-                                        chessBoard.game.player2.hasLost) {
+                                        game.player1.hasLost ||
+                                        game.player2.hasLost) {
                                     endTurn = true;
                                     notifyInput();
-                                    saveMove(destinationSquare, sourceSquare, pieceY, chessBoard);
+                                    saveMove(destinationSquare, sourceSquare, pieceY);
                                 }
                             }
 
@@ -244,7 +244,6 @@ public class BoardGui {
         private void placeFigure(Board board) {
             try {
                 Piece piece;
-               // if ((piece = board.getSquare(this.squareNum)) != Optional.ofNullable(sourceSquare).isEmpty()) {
                 if (Optional.ofNullable(board.getSquare(this.squareNum)).isPresent()) {
                     //read and set icons of the pieces
                     piece = board.getSquare(this.squareNum);
@@ -252,6 +251,7 @@ public class BoardGui {
                             + piece.getPieceType() + ".png";
                     BufferedImage icon = ImageIO.read(new File(imgPath));
                     add(new JLabel(new ImageIcon(icon)));
+
                 }
             } catch(IOException e){
                     e.printStackTrace();

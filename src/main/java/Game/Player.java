@@ -5,7 +5,8 @@ import Pieces.Piece;
 import java.util.Vector;
 
 public class Player {
-    public Game game;
+    protected Game game;
+
     /**
      * Color of the players pieces
      */
@@ -21,9 +22,7 @@ public class Player {
      */
     public boolean isTurn = false;
 
-    /**
-     * If the second player is a computer
-     */
+    private final Board board = Board.getInstance();
 
     public Player(Color color) {
         this.color = color;
@@ -40,10 +39,10 @@ public class Player {
         Vector<Piece> enemyPieces;
 
         if(color == Color.WHITE) {
-            enemyPieces = game.board.blackPieces;
+            enemyPieces = board.blackPieces;
         }
         else {
-            enemyPieces = game.board.whitePieces;
+            enemyPieces = board.whitePieces;
         }
         return enemyPieces;
     }

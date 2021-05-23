@@ -15,7 +15,7 @@ public final class Game {
 
     private static final Game INSTANCE = new Game();
 
-    public Board board;
+    private Board board;
 
     /**
      * Turn
@@ -37,8 +37,8 @@ public final class Game {
         loadPlayers();
         board.loadStandardPieces();
         turn = 0;
-        player1.game = Game.getInstance();
-        player2.game = Game.getInstance();
+        player1.game = INSTANCE;
+        player2.game = INSTANCE;
     }
 
     /**

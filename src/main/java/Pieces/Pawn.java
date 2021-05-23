@@ -5,6 +5,7 @@ import Game.Player;
 
 
 public class Pawn extends Piece {
+    private final static Board board = Board.getInstance();
     public Pawn(int pieceX, int pieceY, final Player player) {
         super(pieceX, pieceY, player);
     }
@@ -56,7 +57,7 @@ public class Pawn extends Piece {
     public static void promotePawn(Piece piece) {
         if (pawnCanPromote(piece)) {
             Piece queen = new Queen(piece.pieceX, piece.pieceY, piece.player);
-            piece.player.game.board.boardArr[piece.pieceX][piece.pieceY] = queen;
+            board.boardArr[piece.pieceX][piece.pieceY] = queen;
         }
     }
 
@@ -66,7 +67,7 @@ public class Pawn extends Piece {
      * @param piece Piece to be promoted
      * @return True if can be promoted, false if can not
      */
-    public static boolean pawnCanPromote(Piece piece) {
+    private static boolean pawnCanPromote(Piece piece) {
         if (piece.getPieceType() == Type.PAWN) {
             //pawn can be promoted when it reaches the end of the board
             if (piece.pieceX == 7 || piece.pieceX == 0) {
@@ -82,7 +83,6 @@ public class Pawn extends Piece {
      * @return true if pawn can make en passant move, false if can not
      */
     public static boolean pawnCanEnPassant(Piece piece) {
-        Board board = piece.player.game.board;
         //pawn can make en passant on another pawn if it has advanced by 2 squares
         if (piece.pieceY != 7 && piece.pieceY != 0) {
             if (board.boardArr[piece.pieceX][piece.pieceY + 1] != null) {
